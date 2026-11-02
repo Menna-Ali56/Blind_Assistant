@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:blind_app/core/theme/app_color_roles.dart';
-import 'package:blind_app/core/theme/app_color_schemes.dart';
+import 'package:baseer/core/theme/app_color_roles.dart';
+import 'package:baseer/core/theme/app_color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

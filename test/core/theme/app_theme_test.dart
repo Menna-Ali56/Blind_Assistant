@@ -1,6 +1,6 @@
-import 'package:blind_app/core/accessibility/text_scale_builder.dart';
-import 'package:blind_app/core/constants/app_dimens.dart';
-import 'package:blind_app/core/theme/app_theme.dart';
+import 'package:baseer/core/accessibility/text_scale_builder.dart';
+import 'package:baseer/core/constants/app_dimens.dart';
+import 'package:baseer/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

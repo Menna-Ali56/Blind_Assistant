@@ -1,4 +1,4 @@
-import 'package:blind_app/core/accessibility/semantics_extension.dart';
+import 'package:baseer/core/accessibility/semantics_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
