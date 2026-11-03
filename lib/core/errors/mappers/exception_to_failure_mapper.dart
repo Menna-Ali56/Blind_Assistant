@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 import '../exceptions/app_exception.dart';
 import '../exceptions/camera_exception.dart';
@@ -16,6 +17,7 @@ import '../exceptions/storage_exception.dart';
 import '../exceptions/timeout_exception.dart';
 
 import '../failures/camera_failure.dart';
+import '../failures/cancelled_failure.dart';
 import '../failures/failure.dart';
 import '../failures/microphone_failure.dart';
 import '../failures/model_failure.dart';
@@ -61,7 +63,10 @@ class ExceptionToFailureMapper {
 
     // Permission exceptions
     if (error is PermissionException) {
-      return const PermissionFailure();
+      return PermissionFailure(
+        permission: error.permission,
+        isPermanentlyDenied: error.isPermanentlyDenied,
+      );
     }
 
     // Camera exceptions
@@ -86,7 +91,9 @@ class ExceptionToFailureMapper {
 
     // OCR exceptions
     if (error is OcrException) {
-      return const OcrFailure();
+      return error.code == 'ocr_no_text'
+          ? const OcrFailure.noText()
+          : const OcrFailure();
     }
 
     // Speech exceptions
@@ -94,8 +101,8 @@ class ExceptionToFailureMapper {
       return const SpeechFailure();
     }
 
-    // Dart exceptions
-    if (error is SocketException) {
+    // Dart / Flutter SDK exceptions
+    if (error is SocketException || error is HttpException) {
       return const NetworkFailure();
     }
 
@@ -103,15 +110,60 @@ class ExceptionToFailureMapper {
       return const TimeoutFailure();
     }
 
-    // Unknown app exception
-    if (error is AppException) {
-      return const UnknownFailure();
+    if (error is FileSystemException) {
+      return const StorageFailure();
+    }
+
+    if (error is PlatformException) {
+      return _mapPlatformException(error);
     }
 
     return const UnknownFailure();
   }
 
+  Failure _mapPlatformException(PlatformException error) {
+    final code = error.code.toLowerCase();
+
+    final isDenied = code.contains('denied') ||
+        code.contains('permission') ||
+        code.contains('unauthorized') ||
+        code.contains('restricted');
+
+    String? permission;
+    if (code.contains('camera')) {
+      permission = AppPermission.camera;
+    } else if (code.contains('audio') ||
+        code.contains('microphone') ||
+        code.contains('record')) {
+      permission = AppPermission.microphone;
+    } else if (code.contains('speech')) {
+      permission = AppPermission.speech;
+    } else if (code.contains('storage') || code.contains('file')) {
+      permission = AppPermission.storage;
+    }
+
+    if (isDenied) {
+      return PermissionFailure(
+        permission: permission,
+        isPermanentlyDenied: code.contains('permanent'),
+      );
+    }
+
+    return switch (permission) {
+      AppPermission.camera => const CameraFailure(),
+      AppPermission.microphone => const MicrophoneFailure(),
+      AppPermission.speech => const SpeechFailure(),
+      AppPermission.storage => const StorageFailure(),
+      _ => const UnknownFailure(),
+    };
+  }
+
   Failure _mapDioException(DioException error) {
+    // An interceptor may have wrapped our own error inside the DioException.
+    final inner = error.error;
+    if (inner is Failure) return inner;
+    if (inner is AppException) return map(inner);
+
     final type = error.type;
 
     if (type == DioExceptionType.connectionTimeout ||
@@ -135,14 +187,14 @@ class ExceptionToFailureMapper {
     }
 
     if (type == DioExceptionType.cancel) {
-      return const UnknownFailure();
+      return const CancelledFailure();
     }
 
-    if (error.error is SocketException) {
+    if (inner is SocketException) {
       return const NetworkFailure();
     }
 
-    if (error.error is TimeoutException) {
+    if (inner is TimeoutException) {
       return const TimeoutFailure();
     }
 

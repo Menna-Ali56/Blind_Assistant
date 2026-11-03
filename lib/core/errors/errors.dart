@@ -9,7 +9,8 @@ export 'exceptions/server_exception.dart';
 export 'exceptions/speech_exception.dart';
 export 'exceptions/storage_exception.dart';
 export 'exceptions/timeout_exception.dart';
-
+export 'failures/cancelled_failure.dart';
+export 'handlers/error_announcer.dart';
 export 'failures/failure.dart';
 export 'failures/camera_failure.dart';
 export 'failures/microphone_failure.dart';
