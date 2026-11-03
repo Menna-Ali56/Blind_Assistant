@@ -5,9 +5,15 @@ import 'error_logger.dart';
 class GlobalErrorHandler {
   GlobalErrorHandler({
     this._logger = const ErrorLogger(),
+    this.onUnhandled,
   });
 
   final ErrorLogger _logger;
+
+  /// Optional hook called after an uncaught error is logged
+  /// (e.g. to announce a generic failure to the user).
+  final void Function(Object error, StackTrace stack)? onUnhandled;
+
   bool _installed = false;
 
   void install() {
@@ -17,11 +23,14 @@ class GlobalErrorHandler {
     final previousFlutterHandler = FlutterError.onError;
 
     FlutterError.onError = (details) {
+      final stack = details.stack ?? StackTrace.current;
+
       _logger.log(
         details.exception,
-        details.stack ?? StackTrace.current,
+        stack,
         context: 'flutter_framework',
       );
+      _notify(details.exception, stack);
 
       previousFlutterHandler?.call(details);
     };
@@ -34,8 +43,17 @@ class GlobalErrorHandler {
         stack,
         context: 'platform_dispatcher',
       );
+      _notify(error, stack);
 
       return previousPlatformHandler?.call(error, stack) ?? false;
     };
+  }
+
+  void _notify(Object error, StackTrace stack) {
+    try {
+      onUnhandled?.call(error, stack);
+    } catch (_) {
+      // The hook must never throw inside an error handler.
+    }
   }
 }
