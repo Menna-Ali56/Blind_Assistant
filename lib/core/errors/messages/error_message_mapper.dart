@@ -8,17 +8,17 @@ class ErrorMessageMapper {
     final isArabic = languageCode.toLowerCase().startsWith('ar');
     final messages = isArabic
         ? const <String, String>{
-            'network_error': 'مفيش اتصال بالإنترنت. اتأكد من الاتصال وحاول تاني',
-            'server_error': 'حصلت مشكلة في الخادم. حاول مرة تانية',
-            'timeout_error': 'الطلب استغرق وقت طويل. حاول تاني',
-            'permission_denied': 'لازم تسمح بالصلاحية المطلوبة عشان تكمل',
-            'camera_unavailable': 'الكاميرا مش متاحة حاليًا',
-            'microphone_unavailable': 'الميكروفون مش متاح حاليًا',
-            'storage_error': 'حصلت مشكلة أثناء حفظ البيانات',
-            'model_error': 'حصلت مشكلة أثناء تشغيل نموذج الذكاء الاصطناعي',
-            'ocr_error': 'مش قادر أتعرف على النص من الصورة',
-            'speech_error': 'حصلت مشكلة في معالجة الكلام',
-            'unexpected_error': 'حصل خطأ غير متوقع. حاول مرة تانية',
+      'network_error': 'لا يوجد اتصال بالإنترنت. يُرجى التحقق من الاتصال والمحاولة مرة أخرى.',
+      'server_error': 'حدثت مشكلة في الخادم. يُرجى المحاولة مرة أخرى.',
+      'timeout_error': 'استغرق الطلب وقتًا أطول من المتوقع. يُرجى المحاولة مرة أخرى.',
+      'permission_denied': 'يُرجى السماح بالوصول إلى الصلاحية المطلوبة للمتابعة.',
+      'camera_unavailable': 'الكاميرا غير متاحة حاليًا.',
+      'microphone_unavailable': 'الميكروفون غير متاح حاليًا.',
+      'storage_error': 'حدثت مشكلة أثناء حفظ البيانات.',
+      'model_error': 'حدثت مشكلة أثناء تشغيل نموذج الذكاء الاصطناعي.',
+      'ocr_error': 'تعذّر التعرّف على النص الموجود في الصورة.',
+      'speech_error': 'حدثت مشكلة أثناء معالجة الكلام.',
+      'unexpected_error': 'حدث خطأ غير متوقع. يُرجى المحاولة مرة أخرى.',
           }
         : const <String, String>{
             'network_error': 'No internet connection. Check your connection and try again.',
