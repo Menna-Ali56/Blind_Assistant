@@ -3,10 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'error_logger.dart';
 
 class GlobalErrorHandler {
-  GlobalErrorHandler({
-    this._logger = const ErrorLogger(),
-    this.onUnhandled,
-  });
+  GlobalErrorHandler({this._logger = const ErrorLogger(), this.onUnhandled});
 
   final ErrorLogger _logger;
 
@@ -25,11 +22,7 @@ class GlobalErrorHandler {
     FlutterError.onError = (details) {
       final stack = details.stack ?? StackTrace.current;
 
-      _logger.log(
-        details.exception,
-        stack,
-        context: 'flutter_framework',
-      );
+      _logger.log(details.exception, stack, context: 'flutter_framework');
       _notify(details.exception, stack);
 
       previousFlutterHandler?.call(details);
@@ -38,11 +31,7 @@ class GlobalErrorHandler {
     final previousPlatformHandler = PlatformDispatcher.instance.onError;
 
     PlatformDispatcher.instance.onError = (error, stack) {
-      _logger.log(
-        error,
-        stack,
-        context: 'platform_dispatcher',
-      );
+      _logger.log(error, stack, context: 'platform_dispatcher');
       _notify(error, stack);
 
       return previousPlatformHandler?.call(error, stack) ?? false;

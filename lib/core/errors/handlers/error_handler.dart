@@ -12,11 +12,7 @@ class ErrorHandler {
   final ExceptionToFailureMapper mapper;
   final ErrorLogger logger;
 
-  Failure handle(
-      Object error,
-      StackTrace stackTrace, {
-        String? context,
-      }) {
+  Failure handle(Object error, StackTrace stackTrace, {String? context}) {
     final failure = mapper.map(error);
     logger.log(error, stackTrace, context: context, code: failure.code);
     return failure;
@@ -24,9 +20,9 @@ class ErrorHandler {
 
   /// Runs [action] and never throws: errors become a ResultFailure.
   Future<Result<T>> guard<T>(
-      Future<T> Function() action, {
-        String? context,
-      }) async {
+    Future<T> Function() action, {
+    String? context,
+  }) async {
     try {
       return ResultSuccess(await action());
     } catch (e, st) {
