@@ -1,6 +1,6 @@
 {
-    "name": "blind_app",
-    "short_name": "blind_app",
+    "name": "Baseer",
+    "short_name": "Baseer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

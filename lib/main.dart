@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  runApp(const BlindApp());
-}
+import 'app/bootstrap.dart';
+import 'core/constants/app_strings.dart';
+import 'core/di/injector.dart';
+import 'core/theme/app_theme.dart';
+import 'features/theme/presentation/cubit/theme_state.dart';
+import 'features/theme/presentation/widgets/apply_text_scale.dart';
+import 'features/theme/presentation/widgets/theme_variant_builder.dart';
 
-class BlindApp extends StatelessWidget {
-  const BlindApp({super.key});
+void main() => bootstrap(const BaseerApp());
+
+class BaseerApp extends StatelessWidget {
+  const BaseerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Blind App',
-      home: Scaffold(
-        body: Center(
-          child: Text('Welcome to the Blind App'),
-        ),
+    return ThemeVariantBuilder(
+      builder: (context, variant) => MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: AppStrings.appTitle,
+        theme: variant == ThemeVariant.highContrast
+            ? AppTheme.highContrast
+            : AppTheme.standard,
+        highContrastTheme: AppTheme.highContrast,
+        builder: applyTextScale,
+        routerConfig: sl<GoRouter>(),
       ),
     );
   }
