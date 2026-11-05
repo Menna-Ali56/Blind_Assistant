@@ -4,9 +4,9 @@ import 'error_logger.dart';
 
 class GlobalErrorHandler {
   GlobalErrorHandler({
-    ErrorLogger logger = const ErrorLogger(),
+    this._logger = const ErrorLogger(),
     this.onUnhandled,
-  }) : _logger = logger;
+  });
 
   final ErrorLogger _logger;
 
