@@ -1,7 +1,7 @@
 import 'app_exception.dart';
 
-class CameraException extends AppException {
-  const CameraException({
+class AppCameraException extends AppException {
+  const AppCameraException({
     super.message = 'Camera unavailable',
     super.code = 'camera',
     super.cause,

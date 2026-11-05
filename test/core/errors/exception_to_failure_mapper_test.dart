@@ -11,7 +11,7 @@ void main() {
   });
 
   test('maps camera exception to camera failure', () {
-    expect(mapper.map(const CameraException()), isA<CameraFailure>());
+    expect(mapper.map(const AppCameraException()), isA<CameraFailure>());
   });
 
   test('maps unknown object to unknown failure', () {

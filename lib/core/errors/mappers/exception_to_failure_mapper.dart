@@ -28,7 +28,7 @@ class ExceptionToFailureMapper {
           permission: permission,
           isPermanentlyDenied: isPermanentlyDenied,
         ),
-      CameraException() => const CameraFailure(),
+      AppCameraException() => const CameraFailure(),
       MicrophoneException() => const MicrophoneFailure(),
       StorageException() || FileSystemException() => const StorageFailure(),
       ModelException() => const ModelFailure(),
