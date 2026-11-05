@@ -12,8 +12,8 @@ class AppDimens {
   static const double hairline = 1;
   static const double disabledAlpha = 0.6;
   static const double lineHeight = 1.5;
-  static const double minTextScale = 1;
-  static const double maxTextScale = 2;
+  static const double itemGap = 16;
+  static const pagePadding = EdgeInsets.all(24);
   static const controlPadding = EdgeInsets.symmetric(
     horizontal: 14,
     vertical: 8,

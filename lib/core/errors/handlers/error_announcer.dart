@@ -1,14 +1,15 @@
 import 'package:flutter/services.dart';
 
-import '../failures/cancelled_failure.dart';
+import '../../constants/app_defaults.dart';
 import '../failures/failure.dart';
 import '../messages/error_message_mapper.dart';
+import '../presentation/error_presentation.dart';
 
 class ErrorAnnouncer {
   ErrorAnnouncer({
-    required this.speak, // مرري هنا دالة الـ TTS بتاعتك
+    required this.speak,
     this.mapper = const ErrorMessageMapper(),
-    this.dedupeWindow = const Duration(seconds: 3),
+    this.dedupeWindow = AppDefaults.errorRepeatWindow,
   });
 
   final Future<void> Function(String text) speak;
@@ -18,28 +19,34 @@ class ErrorAnnouncer {
   Failure? _lastFailure;
   DateTime? _lastAt;
 
-  Future<void> announce(Failure failure, {required String languageCode}) async {
-    // المستخدم هو اللي لغى، مفيش داعي ننطق.
-    if (failure is CancelledFailure) return;
-
-    final now = DateTime.now();
-    final lastAt = _lastAt;
-    if (failure == _lastFailure &&
-        lastAt != null &&
-        now.difference(lastAt) < dedupeWindow) {
-      return; // نفس الخطأ بالظبط اتنطق من ثواني
-    }
+  Future<ErrorPresentation> announce(
+    Failure failure, {
+    required String languageCode,
+  }) async {
+    final presentation = ErrorPresentation.from(
+      failure,
+      languageCode: languageCode,
+      messages: mapper,
+    );
+    if (presentation.isSilent || _isRepeat(failure)) return presentation;
     _lastFailure = failure;
-    _lastAt = now;
+    _lastAt = DateTime.now();
+    await _quietly(HapticFeedback.heavyImpact);
+    await _quietly(() => speak(presentation.message));
+    return presentation;
+  }
 
-    // الاهتزاز تنبيه إضافي، لو فشل منوقفش النطق.
-    try {
-      await HapticFeedback.heavyImpact();
-    } catch (_) {}
+  bool _isRepeat(Failure failure) {
+    final lastAt = _lastAt;
+    return failure == _lastFailure &&
+        lastAt != null &&
+        DateTime.now().difference(lastAt) < dedupeWindow;
+  }
 
-    // النطق في مسار الأخطاء لازم ما يرميش exception تاني.
+  // the error path must never throw again
+  Future<void> _quietly(Future<void> Function() action) async {
     try {
-      await speak(mapper.map(failure, languageCode: languageCode));
+      await action();
     } catch (_) {}
   }
 }

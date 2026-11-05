@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'app/bootstrap.dart';
 import 'core/constants/app_strings.dart';
+import 'core/di/injector.dart';
 import 'core/theme/app_theme.dart';
 import 'features/theme/presentation/cubit/theme_state.dart';
 import 'features/theme/presentation/widgets/apply_text_scale.dart';
@@ -15,7 +17,7 @@ class BaseerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemeVariantBuilder(
-      builder: (context, variant) => MaterialApp(
+      builder: (context, variant) => MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: AppStrings.appTitle,
         theme: variant == ThemeVariant.highContrast
@@ -23,9 +25,7 @@ class BaseerApp extends StatelessWidget {
             : AppTheme.standard,
         highContrastTheme: AppTheme.highContrast,
         builder: applyTextScale,
-        home: const Scaffold(
-          body: Center(child: Text(AppStrings.welcomeMessage)),
-        ),
+        routerConfig: sl<GoRouter>(),
       ),
     );
   }

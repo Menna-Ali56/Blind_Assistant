@@ -1,4 +1,3 @@
-import 'package:baseer/core/accessibility/text_scale_builder.dart';
 import 'package:baseer/core/constants/app_dimens.dart';
 import 'package:baseer/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -31,25 +30,4 @@ void main() {
       });
     });
   }
-
-  testWidgets('text scale is clamped', (tester) async {
-    late double scale;
-    await tester.pumpWidget(
-      MediaQuery(
-        data: const MediaQueryData(textScaler: TextScaler.linear(3)),
-        child: Builder(
-          builder: (context) => appTextScaleBuilder(
-            context,
-            Builder(
-              builder: (inner) {
-                scale = MediaQuery.textScalerOf(inner).scale(10) / 10;
-                return const SizedBox();
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-    expect(scale, AppDimens.maxTextScale);
-  });
 }
