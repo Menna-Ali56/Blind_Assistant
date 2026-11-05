@@ -3,7 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'error_logger.dart';
 
 class GlobalErrorHandler {
-  GlobalErrorHandler({this._logger = const ErrorLogger(), this.onUnhandled});
+  GlobalErrorHandler({
+    ErrorLogger logger = const ErrorLogger(),
+    this.onUnhandled,
+  }) : _logger = logger;
 
   final ErrorLogger _logger;
 
