@@ -1,5 +1,6 @@
 export 'camera_failure.dart';
 export 'cancelled_failure.dart';
+export 'execution_failure.dart';
 export 'failure.dart';
 export 'microphone_failure.dart';
 export 'model_failure.dart';

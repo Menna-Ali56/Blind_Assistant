@@ -1,11 +1,11 @@
 import 'app_exception.dart';
 
-/// Names used by PermissionException / PermissionFailure.
 abstract final class AppPermission {
   static const camera = 'camera';
   static const microphone = 'microphone';
   static const speech = 'speech';
   static const storage = 'storage';
+  static const location = 'location';
 }
 
 class PermissionException extends AppException {
@@ -17,9 +17,6 @@ class PermissionException extends AppException {
     this.isPermanentlyDenied = false,
   });
 
-  /// One of [AppPermission], or null if unknown.
   final String? permission;
-
-  /// true => the user must enable it from system settings.
   final bool isPermanentlyDenied;
 }
