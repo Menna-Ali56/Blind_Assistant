@@ -1,3 +1,4 @@
+export 'errors_module.dart';
 export 'exceptions/exceptions.dart';
 export 'failures/failures.dart';
 export 'handlers/error_announcer.dart';
@@ -10,3 +11,7 @@ export 'mappers/platform_failure_mapper.dart';
 export 'messages/error_message_mapper.dart';
 export 'presentation/error_presentation.dart';
 export 'result/result.dart';
+export 'supervisors/error_policy.dart';
+export 'supervisors/error_report.dart';
+export 'supervisors/error_severity.dart';
+export 'supervisors/error_supervisor.dart';
