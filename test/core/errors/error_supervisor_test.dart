@@ -86,20 +86,23 @@ void main() {
     expect(report.failure, isA<NetworkFailure>());
   });
 
-  test('watch reports failures only and returns the result unchanged', () async {
-    final seen = <ErrorReport>[];
-    supervisor.reports.listen(seen.add);
+  test(
+    'watch reports failures only and returns the result unchanged',
+    () async {
+      final seen = <ErrorReport>[];
+      supervisor.reports.listen(seen.add);
 
-    final ok = await supervisor.watch(
-      Future.value(const ResultSuccess<int>(1)),
-    );
-    final bad = await supervisor.watch(
-      Future.value(const ResultFailure<int>(NetworkFailure())),
-    );
-    await pumpEventQueue();
+      final ok = await supervisor.watch(
+        Future.value(const ResultSuccess<int>(1)),
+      );
+      final bad = await supervisor.watch(
+        Future.value(const ResultFailure<int>(NetworkFailure())),
+      );
+      await pumpEventQueue();
 
-    expect(ok.isSuccess, isTrue);
-    expect(bad.isFailure, isTrue);
-    expect(seen, hasLength(1));
-  });
+      expect(ok.isSuccess, isTrue);
+      expect(bad.isFailure, isTrue);
+      expect(seen, hasLength(1));
+    },
+  );
 }
