@@ -7,7 +7,6 @@ import '../result/result.dart';
 import 'error_policy.dart';
 import 'error_report.dart';
 
-
 class ErrorSupervisor {
   ErrorSupervisor({
     ErrorHandler errorHandler = const ErrorHandler(),
@@ -17,7 +16,7 @@ class ErrorSupervisor {
     this.escalateAfter = defaultEscalateAfter,
     this.escalationWindow = defaultEscalationWindow,
   }) : _errors = errorHandler,
-        _now = now ?? DateTime.now;
+       _now = now ?? DateTime.now;
 
   static const int defaultEscalateAfter = 3;
   static const Duration defaultEscalationWindow = Duration(seconds: 30);
@@ -28,9 +27,7 @@ class ErrorSupervisor {
   final ErrorPolicy _policy;
   final DateTime Function() _now;
 
-
   final Duration repeatWindow;
-
 
   final int escalateAfter;
   final Duration escalationWindow;
@@ -43,7 +40,6 @@ class ErrorSupervisor {
   Stream<ErrorReport> get reports => _controller.stream;
 
   ErrorReport? get lastReport => _last;
-
 
   ErrorReport report(
     Object error, {
@@ -85,7 +81,6 @@ class ErrorSupervisor {
     if (!_controller.isClosed) _controller.add(report);
     return report;
   }
-
 
   Future<Result<T>> watch<T>(
     Future<Result<T>> result, {

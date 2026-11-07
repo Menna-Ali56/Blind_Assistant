@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import '../failures/failure.dart';
 import 'error_severity.dart';
 
-
 class ErrorReport extends Equatable {
   const ErrorReport({
     required this.failure,
@@ -18,18 +17,14 @@ class ErrorReport extends Equatable {
   final Failure failure;
   final ErrorSeverity severity;
 
-
   final String source;
   final DateTime at;
-
 
   final int occurrences;
 
   final bool shouldAnnounce;
 
-
   final bool isRepeating;
-
 
   bool get canRetry => failure.isRetryable && !isRepeating;
 

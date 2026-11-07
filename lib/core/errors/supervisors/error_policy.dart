@@ -6,7 +6,6 @@ import '../failures/permission_failure.dart';
 import '../failures/timeout_failure.dart';
 import 'error_severity.dart';
 
-
 class ErrorPolicy {
   const ErrorPolicy();
 
@@ -19,7 +18,6 @@ class ErrorPolicy {
     if (_isExpected(failure)) return ErrorSeverity.warning;
     return ErrorSeverity.error;
   }
-
 
   bool shouldAnnounce(Failure failure) => failure is! CancelledFailure;
 

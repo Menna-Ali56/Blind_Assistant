@@ -4,7 +4,6 @@ enum ErrorSeverity {
   error,
   critical;
 
-
   int get priority => index;
 
   ErrorSeverity get escalated =>
