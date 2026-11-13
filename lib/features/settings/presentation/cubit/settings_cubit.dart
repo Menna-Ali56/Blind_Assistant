@@ -13,12 +13,11 @@ class SettingsCubit extends BaseCubit<SettingsState> {
     required LoadSettings loadSettings,
     required SaveSettings saveSettings,
     required DeleteUserData deleteUserData,
-    required ErrorSupervisor supervisor,
+    required this.supervisor,
     Iterable<SettingsEffect> effects = const [],
   }) : _load = loadSettings,
        _save = saveSettings,
        _delete = deleteUserData,
-       _supervisor = supervisor,
        _effects = List.of(effects),
        super(const SettingsState());
 
@@ -27,9 +26,11 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   final LoadSettings _load;
   final SaveSettings _save;
   final DeleteUserData _delete;
-  final ErrorSupervisor _supervisor;
+  final ErrorSupervisor supervisor;
   final List<SettingsEffect> _effects;
 
+  /// Reads the saved settings and applies them.
+  /// A failure keeps the defaults, so the app always starts.
   Future<void> load() async {
     safeEmit(state.copyWith(status: SettingsStatus.loading));
     final result = await _load();
@@ -46,7 +47,7 @@ class SettingsCubit extends BaseCubit<SettingsState> {
 
     final loadFailure = failure;
     if (loadFailure != null) {
-      _supervisor.reportFailure(loadFailure, source: _source);
+      supervisor.reportFailure(loadFailure, source: _source);
     }
 
     safeEmit(
@@ -100,7 +101,7 @@ class SettingsCubit extends BaseCubit<SettingsState> {
         );
       },
       onFailure: (failure) {
-        _supervisor.reportFailure(failure, source: _source);
+        supervisor.reportFailure(failure, source: _source);
         safeEmit(state.copyWith(failure: failure));
       },
     );
@@ -124,7 +125,7 @@ class SettingsCubit extends BaseCubit<SettingsState> {
     result.fold(
       onSuccess: (_) {},
       onFailure: (failure) {
-        _supervisor.reportFailure(failure, source: _source);
+        supervisor.reportFailure(failure, source: _source);
 
         if (state.settings != next) return;
 
