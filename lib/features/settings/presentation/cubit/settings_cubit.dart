@@ -32,7 +32,7 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   final ErrorSupervisor _supervisor;
   final List<SettingsEffect> _effects;
 
-  
+
   Future<void> load() async {
     safeEmit(state.copyWith(status: SettingsStatus.loading));
     final result = await _load();
