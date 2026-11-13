@@ -1,8 +1,6 @@
 import '../../../../core/constants/app_defaults.dart';
 import '../../domain/entities/app_settings.dart';
 
-/// Turns settings into JSON and back. Reading is forgiving: a missing,
-/// unknown or out of range value falls back to the default.
 abstract final class AppSettingsMapper {
   static const int schemaVersion = 1;
 
