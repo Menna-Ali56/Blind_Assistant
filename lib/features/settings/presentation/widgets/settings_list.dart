@@ -194,10 +194,7 @@ class SettingsList extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmDelete(
-    BuildContext context,
-    SettingsCubit cubit,
-  ) async {
+  Future<void> _confirmDelete(BuildContext context, SettingsCubit cubit) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => DeleteDialog(strings: strings),

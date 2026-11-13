@@ -1,4 +1,3 @@
-
 abstract interface class SecureStore {
   Future<String?> read(String key);
 

@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../errors/exceptions/storage_exception.dart';
 import 'secure_store.dart';
 
-
 class FlutterSecureStore implements SecureStore {
   const FlutterSecureStore([this._storage = const FlutterSecureStorage()]);
 

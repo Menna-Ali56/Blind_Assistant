@@ -49,13 +49,10 @@ class SettingsPalette {
   final Color subtitle;
   final Color sectionLabel;
 
-
   final Color accent;
-
 
   final Color accentDark;
   final Color onAccent;
-
 
   final Color tile;
 

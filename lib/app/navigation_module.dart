@@ -13,7 +13,7 @@ class NavigationModule implements DiModule {
   @override
   void register(GetIt locator) {
     locator.registerLazySingleton<GoRouter>(
-          () => buildRouter(
+      () => buildRouter(
         appPage,
         extraRoutes: [permissionsRoute(), settingsRoute()],
         redirect: permissionsRedirect(locator<PermissionsCubit>()),

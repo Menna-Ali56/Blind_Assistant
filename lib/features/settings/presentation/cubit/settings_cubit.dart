@@ -1,4 +1,3 @@
-
 import '../../../../core/cubit/base_cubit.dart';
 import '../../../../core/errors/errors.dart';
 import '../../domain/entities/app_settings.dart';
@@ -17,12 +16,11 @@ class SettingsCubit extends BaseCubit<SettingsState> {
     required ErrorSupervisor supervisor,
     Iterable<SettingsEffect> effects = const [],
   }) : _load = loadSettings,
-        _save = saveSettings,
-        _delete = deleteUserData,
-        _supervisor = supervisor,
-        _effects = List.of(effects),
-        super(const SettingsState());
-
+       _save = saveSettings,
+       _delete = deleteUserData,
+       _supervisor = supervisor,
+       _effects = List.of(effects),
+       super(const SettingsState());
 
   static const String _source = 'settings';
 
@@ -31,7 +29,6 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   final DeleteUserData _delete;
   final ErrorSupervisor _supervisor;
   final List<SettingsEffect> _effects;
-
 
   Future<void> load() async {
     safeEmit(state.copyWith(status: SettingsStatus.loading));
@@ -62,17 +59,15 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   }
 
   Future<void> cycleVoiceRate() => _update(
-        (s) => s.copyWith(
-      voiceRate: VoiceRate.values[
-      (s.voiceRate.index + 1) % VoiceRate.values.length
-      ],
+    (s) => s.copyWith(
+      voiceRate:
+          VoiceRate.values[(s.voiceRate.index + 1) % VoiceRate.values.length],
     ),
   );
 
   Future<void> cycleTextSize() => _update(
-        (s) => s.copyWith(
-      textScale: TextSizeStep.fromScale(s.textScale).next.scale,
-    ),
+    (s) =>
+        s.copyWith(textScale: TextSizeStep.fromScale(s.textScale).next.scale),
   );
 
   Future<void> toggleHighContrast() =>
@@ -111,14 +106,11 @@ class SettingsCubit extends BaseCubit<SettingsState> {
     );
   }
 
-  void acknowledgeDeleted() =>
-      safeEmit(state.copyWith(justDeleted: false));
+  void acknowledgeDeleted() => safeEmit(state.copyWith(justDeleted: false));
 
   /// Changes the screen at once, then saves.
   /// If saving fails the old value comes back and the problem is reported.
-  Future<void> _update(
-      AppSettings Function(AppSettings current) change,
-      ) async {
+  Future<void> _update(AppSettings Function(AppSettings current) change) async {
     final previous = state.settings;
     final next = change(previous);
 

@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
       title: AppStrings.welcomeMessage,
       child: ListView.separated(
         padding: AppDimens.pagePadding,
-        itemCount: shortcuts.length+1,
+        itemCount: shortcuts.length + 1,
         separatorBuilder: (context, index) =>
             const SizedBox(height: AppDimens.itemGap),
         itemBuilder: (context, index) {

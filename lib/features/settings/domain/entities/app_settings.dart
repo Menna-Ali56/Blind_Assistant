@@ -19,9 +19,7 @@ class AppSettings extends Equatable {
   final bool highContrast;
   final bool haptics;
 
-
   final bool wakeWord;
-
 
   final bool allowImageUpload;
 

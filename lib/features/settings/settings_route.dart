@@ -7,7 +7,6 @@ import 'presentation/pages/settings_page.dart';
 
 const String settingsPath = '/settings';
 
-
 GoRoute settingsRoute() => GoRoute(
   path: settingsPath,
   builder: (context, state) => BlocProvider<SettingsCubit>.value(

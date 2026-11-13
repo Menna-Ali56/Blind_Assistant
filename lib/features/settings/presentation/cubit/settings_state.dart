@@ -16,9 +16,7 @@ class SettingsState extends Equatable {
   final SettingsStatus status;
   final AppSettings settings;
 
-
   final Failure? failure;
-
 
   final bool justDeleted;
 

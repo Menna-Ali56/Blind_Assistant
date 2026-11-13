@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'secure_store.dart';
 
 extension SecureStoreJson on SecureStore {
-
   Future<Map<String, Object?>?> readJson(String key) async {
     final raw = await read(key);
     if (raw == null) return null;

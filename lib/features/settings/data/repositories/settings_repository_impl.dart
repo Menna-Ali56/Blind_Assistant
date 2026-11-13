@@ -8,9 +8,9 @@ import '../models/app_settings_mapper.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   const SettingsRepositoryImpl(
-      this._store, {
-        ErrorHandler errorHandler = const ErrorHandler(),
-      }) : _errors = errorHandler;
+    this._store, {
+    ErrorHandler errorHandler = const ErrorHandler(),
+  }) : _errors = errorHandler;
 
   static const String storageKey = 'settings.v1';
   static const String _logContext = 'settings_repository';
@@ -28,7 +28,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<Result<void>> save(AppSettings settings) => _errors.guard(
-        () => _store.writeJson(storageKey, AppSettingsMapper.toJson(settings)),
+    () => _store.writeJson(storageKey, AppSettingsMapper.toJson(settings)),
     context: _logContext,
   );
 

@@ -57,7 +57,9 @@ class _SettingRowState extends State<SettingRow> {
     final iconColor = widget.destructive ? palette.danger : palette.accentDark;
     final tileColor = widget.destructive ? palette.dangerTile : palette.tile;
     final titleColor = widget.destructive ? palette.danger : palette.title;
-    const radius = BorderRadius.all(Radius.circular(SettingsPalette.cardRadius));
+    const radius = BorderRadius.all(
+      Radius.circular(SettingsPalette.cardRadius),
+    );
 
     return Semantics(
       button: true,

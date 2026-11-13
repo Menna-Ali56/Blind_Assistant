@@ -1,7 +1,6 @@
 import '../../../../core/constants/app_defaults.dart';
 import '../../domain/entities/app_settings.dart';
 
-
 abstract final class AppSettingsMapper {
   static const int schemaVersion = 1;
 
@@ -19,7 +18,7 @@ abstract final class AppSettingsMapper {
     const defaults = AppSettings();
     return AppSettings(
       voiceRate:
-      _enumByName(json['voiceRate'], VoiceRate.values) ??
+          _enumByName(json['voiceRate'], VoiceRate.values) ??
           defaults.voiceRate,
       textScale: _scale(json['textScale']) ?? defaults.textScale,
       highContrast: _flag(json['highContrast'], defaults.highContrast),

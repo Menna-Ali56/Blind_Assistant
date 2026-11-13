@@ -3,7 +3,6 @@ import '../../../theme/presentation/cubit/theme_state.dart';
 import '../../domain/entities/app_settings.dart';
 import 'settings_effect.dart';
 
-
 class ThemeSettingsEffect implements SettingsEffect {
   const ThemeSettingsEffect(this._theme);
 

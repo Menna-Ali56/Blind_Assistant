@@ -1,6 +1,5 @@
 import 'secure_store.dart';
 
-
 class InMemorySecureStore implements SecureStore {
   final Map<String, String> _values = {};
 
