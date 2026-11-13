@@ -32,8 +32,7 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   final ErrorSupervisor _supervisor;
   final List<SettingsEffect> _effects;
 
-  /// Reads the saved settings and applies them.
-  /// A failure keeps the defaults, so the app always starts.
+  
   Future<void> load() async {
     safeEmit(state.copyWith(status: SettingsStatus.loading));
     final result = await _load();
