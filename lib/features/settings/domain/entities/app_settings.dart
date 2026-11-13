@@ -19,10 +19,10 @@ class AppSettings extends Equatable {
   final bool highContrast;
   final bool haptics;
 
-  /// The "Ya Baseer" voice trigger.
+
   final bool wakeWord;
 
-  /// Sending a photo to the cloud is off until the user allows it.
+
   final bool allowImageUpload;
 
   AppSettings copyWith({

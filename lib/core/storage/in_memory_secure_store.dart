@@ -1,6 +1,6 @@
 import 'secure_store.dart';
 
-/// Keeps values in memory only. For tests and previews.
+
 class InMemorySecureStore implements SecureStore {
   final Map<String, String> _values = {};
 

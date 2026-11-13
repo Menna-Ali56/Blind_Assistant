@@ -4,8 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../errors/exceptions/storage_exception.dart';
 import 'secure_store.dart';
 
-/// Uses the Android Keystore and the iOS Keychain, so the app does not
-/// handle any encryption keys itself.
+
 class FlutterSecureStore implements SecureStore {
   const FlutterSecureStore([this._storage = const FlutterSecureStorage()]);
 
