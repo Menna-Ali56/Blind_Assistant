@@ -43,7 +43,7 @@ class ErrorOutputBridge {
     if (presentation.isSilent) return;
     _coordinator.submit(
       OutputMessage(
-        text: presentation.message,
+        text: presentation.spoken,
         languageCode: languageCode,
         priority: _priorityOf(report.severity),
         haptic: _hapticOf(report.severity),

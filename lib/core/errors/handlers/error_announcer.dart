@@ -32,7 +32,7 @@ class ErrorAnnouncer {
     _lastFailure = failure;
     _lastAt = DateTime.now();
     await _quietly(HapticFeedback.heavyImpact);
-    await _quietly(() => speak(presentation.message));
+    await _quietly(() => speak(presentation.spoken));
     return presentation;
   }
 
@@ -43,7 +43,7 @@ class ErrorAnnouncer {
         DateTime.now().difference(lastAt) < dedupeWindow;
   }
 
-  // the error path must never throw again
+  // never throw in the error path
   Future<void> _quietly(Future<void> Function() action) async {
     try {
       await action();
