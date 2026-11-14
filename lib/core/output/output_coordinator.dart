@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'audio_focus.dart';
 import 'output_channel.dart';
 import 'output_message.dart';
 import 'output_queue.dart';
@@ -7,14 +8,20 @@ import 'output_queue.dart';
 class OutputCoordinator {
   OutputCoordinator(
     this._channel, {
+    this.focus = const NoAudioFocus(),
     DateTime Function()? now,
     this.maxPending = defaultMaxPending,
     this.onChannelError,
-  }) : _now = now ?? DateTime.now;
+  }) : _now = now ?? DateTime.now {
+    _interruptionSub = focus.interruptions.listen(
+      (_) => unawaited(stopCurrent()),
+    );
+  }
 
   static const int defaultMaxPending = 10;
 
   final OutputChannel _channel;
+  final AudioFocus focus;
   final DateTime Function() _now;
 
   /// Waiting messages above this count are dropped, lowest priority first.
@@ -24,9 +31,11 @@ class OutputCoordinator {
   final void Function(Object error, StackTrace stackTrace)? onChannelError;
 
   final OutputQueue _queue = OutputQueue();
+  StreamSubscription<void>? _interruptionSub;
   OutputMessage? _current;
   Completer<void>? _stopSignal;
   Future<void>? _stopping;
+  bool _hasFocus = false;
   bool _draining = false;
   bool _disposed = false;
 
@@ -58,10 +67,13 @@ class OutputCoordinator {
     unawaited(_interrupt());
   }
 
-  Future<void> dispose() {
+  Future<void> dispose() async {
     _disposed = true;
     _queue.clear();
-    return _interrupt();
+    await _interruptionSub?.cancel();
+    _interruptionSub = null;
+    await _interrupt();
+    await _releaseFocus();
   }
 
   bool _shouldInterrupt(OutputMessage incoming) {
@@ -83,15 +95,21 @@ class OutputCoordinator {
   Future<void> _drain() async {
     if (_draining) return;
     _draining = true;
+    var played = false;
     try {
       while (!_disposed) {
         final next = _nextLive();
         if (next == null) break;
+        played = true;
         await _play(next);
       }
     } finally {
       _draining = false;
     }
+    if (played && (_queue.isEmpty || _disposed)) {
+      await _releaseFocus();
+    }
+    if (!_disposed && !_queue.isEmpty) unawaited(_drain());
   }
 
   OutputMessage? _nextLive() {
@@ -114,18 +132,33 @@ class OutputCoordinator {
       final pendingStop = _stopping;
       if (pendingStop != null) await pendingStop;
       if (signal.isCompleted) return;
+      if (!_hasFocus) {
+        _hasFocus = true;
+        if (focus is! NoAudioFocus) await _safe(focus.acquire);
+      }
+      if (signal.isCompleted) return;
       if (message.haptic != OutputHaptic.none) {
         await _safe(() => _channel.haptic(message.haptic));
       }
       if (signal.isCompleted) return;
       final spoken = _safe(
-        () => _channel.speak(message.text, languageCode: message.languageCode),
+        () => _channel.speak(
+          message.text,
+          languageCode: message.languageCode,
+          priority: message.priority,
+        ),
       );
       await Future.any<void>([spoken, signal.future]);
     } finally {
       _current = null;
       _stopSignal = null;
     }
+  }
+
+  Future<void> _releaseFocus() async {
+    if (!_hasFocus) return;
+    _hasFocus = false;
+    if (focus is! NoAudioFocus) await _safe(focus.release);
   }
 
   // the output path must never throw

@@ -51,6 +51,18 @@ void main() {
       expect(harness.channel.spoken.single, contains('voice commands'));
     });
 
+    test('announce stays quiet when a screen reader is active', () async {
+      final readerHarness = PermissionsHarness(
+        screenReader: FakeScreenReaderStatus(isActive: true),
+      );
+      addTearDown(readerHarness.cubit.close);
+
+      readerHarness.cubit.announce(PermissionKind.camera);
+      await pumpEventQueue();
+
+      expect(readerHarness.channel.spoken, isEmpty);
+    });
+
     test('openSettings reaches the repository', () async {
       await harness.cubit.openSettings();
 

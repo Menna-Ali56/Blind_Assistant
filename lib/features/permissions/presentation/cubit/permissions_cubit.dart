@@ -1,3 +1,4 @@
+import '../../../../core/accessibility/screen_reader_status.dart';
 import '../../../../core/cubit/base_cubit.dart';
 import '../../../../core/output/output.dart';
 import '../../domain/entities/access_status.dart';
@@ -16,6 +17,7 @@ class PermissionsCubit extends BaseCubit<PermissionsState> {
     required this.progress,
     required this.output,
     required this.languageCode,
+    this.screenReader = const PlatformScreenReaderStatus(),
   }) : super(const PermissionsState());
 
   static const String ownerId = 'permissions';
@@ -25,6 +27,7 @@ class PermissionsCubit extends BaseCubit<PermissionsState> {
   final PermissionFlowProgress progress;
   final OutputCoordinator output;
   final String Function() languageCode;
+  final ScreenReaderStatus screenReader;
 
   PermissionTexts get texts => permissionTextsFor(languageCode());
 
@@ -42,8 +45,10 @@ class PermissionsCubit extends BaseCubit<PermissionsState> {
   void skip(PermissionKind kind) =>
       safeEmit(state.copyWith(skipped: {...state.skipped, kind}));
 
-  void announce(PermissionKind kind) =>
-      _say(texts.announcement(kind, state.statusOf(kind)));
+  void announce(PermissionKind kind) {
+    if (screenReader.isActive) return;
+    _say(texts.announcement(kind, state.statusOf(kind)));
+  }
 
   Future<bool> needsFlow() async {
     if (progress.isCompleted) return false;

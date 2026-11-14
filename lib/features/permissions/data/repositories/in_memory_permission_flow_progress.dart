@@ -7,5 +7,8 @@ class InMemoryPermissionFlowProgress implements PermissionFlowProgress {
   bool get isCompleted => _completed;
 
   @override
+  Future<void> load() async {}
+
+  @override
   void markCompleted() => _completed = true;
 }

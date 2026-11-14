@@ -14,7 +14,11 @@ class FakeChannel implements OutputChannel {
   int stops = 0;
 
   @override
-  Future<void> speak(String text, {required String languageCode}) {
+  Future<void> speak(
+    String text, {
+    required String languageCode,
+    required OutputPriority priority,
+  }) {
     spoken.add(text);
     if (text == 'bad') throw StateError('speaker broke');
     if (autoComplete) return Future<void>.value();
