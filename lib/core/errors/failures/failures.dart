@@ -1,3 +1,4 @@
+export 'api_failure.dart';
 export 'camera_failure.dart';
 export 'cancelled_failure.dart';
 export 'execution_failure.dart';
@@ -7,6 +8,7 @@ export 'model_failure.dart';
 export 'network_failure.dart';
 export 'ocr_failure.dart';
 export 'permission_failure.dart';
+export 'retry_hint.dart';
 export 'server_failure.dart';
 export 'speech_failure.dart';
 export 'storage_failure.dart';

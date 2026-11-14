@@ -1,8 +1,10 @@
+import '../failures/api_failure.dart';
 import '../failures/cancelled_failure.dart';
 import '../failures/execution_failure.dart';
 import '../failures/failure.dart';
 import '../failures/network_failure.dart';
 import '../failures/permission_failure.dart';
+import '../failures/retry_hint.dart';
 import '../failures/timeout_failure.dart';
 import 'error_severity.dart';
 
@@ -25,5 +27,9 @@ class ErrorPolicy {
       failure is PermissionFailure ||
       failure is ExecutionFailure ||
       failure is NetworkFailure ||
-      failure is TimeoutFailure;
+      failure is TimeoutFailure ||
+      _isUserFixable(failure);
+
+  bool _isUserFixable(Failure failure) =>
+      failure is ApiFailure && failure.retryHint == RetryHint.newCapture;
 }
