@@ -6,6 +6,7 @@ export 'handlers/error_handler.dart';
 export 'handlers/error_logger.dart';
 export 'handlers/global_error_handler.dart';
 export 'mappers/dio_failure_mapper.dart';
+export 'mappers/error_code_registry.dart';
 export 'mappers/exception_to_failure_mapper.dart';
 export 'mappers/platform_failure_mapper.dart';
 export 'messages/error_message_mapper.dart';
