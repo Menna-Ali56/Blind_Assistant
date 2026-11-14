@@ -37,6 +37,22 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Fetch contracts
+        if: ${{ vars.CONTRACTS_REPO != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.CONTRACTS_REPO }}
+          ref: ${{ vars.CONTRACTS_TAG }}
+          token: ${{ secrets.CONTRACTS_TOKEN }}
+          path: contracts-source
+
+      - name: Use fetched contracts
+        if: ${{ vars.CONTRACTS_REPO != '' }}
+        run: |
+          rm -rf contracts
+          cp -r contracts-source/contracts contracts
+          rm -rf contracts-source
+
       - name: Check formatting
         run: dart format --set-exit-if-changed .
 
