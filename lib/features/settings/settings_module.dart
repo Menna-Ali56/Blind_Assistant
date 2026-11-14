@@ -6,11 +6,14 @@ import '../../core/errors/errors.dart';
 import '../../core/storage/secure_store.dart';
 import '../theme/presentation/cubit/theme_cubit.dart';
 import 'data/repositories/settings_repository_impl.dart';
+import 'domain/repositories/account_deletion_remote.dart';
+import 'domain/repositories/preferences_remote.dart';
 import 'domain/repositories/settings_repository.dart';
 import 'domain/usecases/delete_user_data.dart';
 import 'domain/usecases/load_settings.dart';
 import 'domain/usecases/save_settings.dart';
 import 'presentation/cubit/settings_cubit.dart';
+import 'presentation/effects/preferences_sync_effect.dart';
 import 'presentation/effects/theme_settings_effect.dart';
 
 class SettingsModule implements DiModule {
@@ -18,6 +21,14 @@ class SettingsModule implements DiModule {
 
   @override
   void register(GetIt locator) {
+    if (!locator.isRegistered<PreferencesRemote>()) {
+      locator.registerLazySingleton<PreferencesRemote>(NoPreferencesRemote.new);
+    }
+    if (!locator.isRegistered<AccountDeletionRemote>()) {
+      locator.registerLazySingleton<AccountDeletionRemote>(
+        NoRemoteDeletion.new,
+      );
+    }
     locator
       ..registerLazySingleton<SettingsRepository>(
         () => SettingsRepositoryImpl(
@@ -32,7 +43,10 @@ class SettingsModule implements DiModule {
         () => SaveSettings(locator<SettingsRepository>()),
       )
       ..registerLazySingleton<DeleteUserData>(
-        () => DeleteUserData(locator<SettingsRepository>()),
+        () => DeleteUserData(
+          locator<SettingsRepository>(),
+          remote: locator<AccountDeletionRemote>(),
+        ),
       )
       ..registerSharedCubit<SettingsCubit>(
         (l) => SettingsCubit(
@@ -40,7 +54,10 @@ class SettingsModule implements DiModule {
           saveSettings: l<SaveSettings>(),
           deleteUserData: l<DeleteUserData>(),
           supervisor: l<ErrorSupervisor>(),
-          effects: [ThemeSettingsEffect(l<ThemeCubit>())],
+          effects: [
+            ThemeSettingsEffect(l<ThemeCubit>()),
+            PreferencesSyncEffect(l<PreferencesRemote>()),
+          ],
         ),
       );
   }

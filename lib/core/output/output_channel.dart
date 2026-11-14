@@ -1,22 +1,30 @@
+import 'output_priority.dart';
+
 enum OutputHaptic { none, light, heavy }
 
-/// The device side of output: speech and vibration.
-/// The real text to speech feature implements this.
 abstract interface class OutputChannel {
-  /// Completes when the speech has finished.
-  Future<void> speak(String text, {required String languageCode});
+  Future<void> speak(
+    String text, {
+    required String languageCode,
+    required OutputPriority priority,
+  });
 
   Future<void> stop();
 
   Future<void> haptic(OutputHaptic kind);
 }
 
-/// Default channel that does nothing, until a real one is registered.
+abstract interface class SpeechChannel implements OutputChannel {}
+
 class SilentOutputChannel implements OutputChannel {
   const SilentOutputChannel();
 
   @override
-  Future<void> speak(String text, {required String languageCode}) async {}
+  Future<void> speak(
+    String text, {
+    required String languageCode,
+    required OutputPriority priority,
+  }) async {}
 
   @override
   Future<void> stop() async {}

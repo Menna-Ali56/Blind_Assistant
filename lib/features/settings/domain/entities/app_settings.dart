@@ -11,17 +11,13 @@ class AppSettings extends Equatable {
     this.highContrast = false,
     this.haptics = true,
     this.wakeWord = true,
-    this.allowImageUpload = false,
   });
 
   final VoiceRate voiceRate;
   final double textScale;
   final bool highContrast;
   final bool haptics;
-
   final bool wakeWord;
-
-  final bool allowImageUpload;
 
   AppSettings copyWith({
     VoiceRate? voiceRate,
@@ -29,7 +25,6 @@ class AppSettings extends Equatable {
     bool? highContrast,
     bool? haptics,
     bool? wakeWord,
-    bool? allowImageUpload,
   }) {
     return AppSettings(
       voiceRate: voiceRate ?? this.voiceRate,
@@ -37,7 +32,6 @@ class AppSettings extends Equatable {
       highContrast: highContrast ?? this.highContrast,
       haptics: haptics ?? this.haptics,
       wakeWord: wakeWord ?? this.wakeWord,
-      allowImageUpload: allowImageUpload ?? this.allowImageUpload,
     );
   }
 
@@ -48,6 +42,5 @@ class AppSettings extends Equatable {
     highContrast,
     haptics,
     wakeWord,
-    allowImageUpload,
   ];
 }

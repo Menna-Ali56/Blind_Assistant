@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/consent/consent_scope.dart';
+import '../../../consent/consent.dart';
 import '../../domain/entities/app_settings.dart';
 import '../cubit/settings_cubit.dart';
 import '../cubit/text_size_step.dart';
@@ -15,6 +17,12 @@ class SettingsList extends StatelessWidget {
     required this.strings,
     required this.settings,
   });
+
+  static const List<(ConsentScope, IconData)> _consentScopes = [
+    (ConsentScope.imageUpload, Icons.photo_camera_outlined),
+    (ConsentScope.audioUpload, Icons.graphic_eq),
+    (ConsentScope.locationShare, Icons.location_on_outlined),
+  ];
 
   final SettingsStrings strings;
   final AppSettings settings;
@@ -98,25 +106,44 @@ class SettingsList extends StatelessWidget {
             cubit.toggleWakeWord,
             toggle: settings.wakeWord,
           ),
-          _row(
-            Icons.photo_camera_outlined,
-            strings.imageUpload,
-            strings.allowed(settings.allowImageUpload),
-            cubit.toggleImageUpload,
-            toggle: settings.allowImageUpload,
-          ),
         ]),
-        _section(palette, text, strings.sectionPrivacy, [
-          _row(
-            Icons.delete_outline,
-            strings.deleteData,
-            strings.deleteValue,
-            () => _confirmDelete(context, cubit),
-            hint: strings.deleteHint,
-            destructive: true,
-          ),
-        ]),
+        _privacySection(context, palette, text, cubit),
       ],
+    );
+  }
+
+  Widget _privacySection(
+    BuildContext context,
+    SettingsPalette palette,
+    TextTheme text,
+    SettingsCubit cubit,
+  ) {
+    final deleteRow = _row(
+      Icons.delete_outline,
+      strings.deleteData,
+      strings.deleteValue,
+      () => _confirmDelete(context, cubit),
+      hint: strings.deleteHint,
+      destructive: true,
+    );
+    final consentCubit = _maybeConsentCubit(context);
+    if (consentCubit == null) {
+      return _section(palette, text, strings.sectionPrivacy, [deleteRow]);
+    }
+    return BlocBuilder<ConsentCubit, ConsentState>(
+      bloc: consentCubit,
+      builder: (context, consentState) =>
+          _section(palette, text, strings.sectionPrivacy, [
+            for (final item in _consentScopes)
+              _row(
+                item.$2,
+                strings.consentLabel(item.$1),
+                strings.allowed(consentState.allows(item.$1)),
+                () => consentCubit.toggle(item.$1),
+                toggle: consentState.allows(item.$1),
+              ),
+            deleteRow,
+          ]),
     );
   }
 
@@ -199,6 +226,17 @@ class SettingsList extends StatelessWidget {
       context: context,
       builder: (_) => DeleteDialog(strings: strings),
     );
-    if (confirmed ?? false) await cubit.deleteAllData();
+    if (!(confirmed ?? false)) return;
+    await cubit.deleteAllData();
+    if (!context.mounted || !cubit.state.justDeleted) return;
+    _maybeConsentCubit(context)?.reset();
+  }
+
+  ConsentCubit? _maybeConsentCubit(BuildContext context) {
+    try {
+      return BlocProvider.of<ConsentCubit>(context);
+    } on ProviderNotFoundException {
+      return null;
+    }
   }
 }

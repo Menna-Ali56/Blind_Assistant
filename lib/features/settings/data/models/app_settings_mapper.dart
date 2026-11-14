@@ -11,7 +11,6 @@ abstract final class AppSettingsMapper {
     'highContrast': settings.highContrast,
     'haptics': settings.haptics,
     'wakeWord': settings.wakeWord,
-    'allowImageUpload': settings.allowImageUpload,
   };
 
   static AppSettings fromJson(Map<String, Object?> json) {
@@ -24,10 +23,6 @@ abstract final class AppSettingsMapper {
       highContrast: _flag(json['highContrast'], defaults.highContrast),
       haptics: _flag(json['haptics'], defaults.haptics),
       wakeWord: _flag(json['wakeWord'], defaults.wakeWord),
-      allowImageUpload: _flag(
-        json['allowImageUpload'],
-        defaults.allowImageUpload,
-      ),
     );
   }
 

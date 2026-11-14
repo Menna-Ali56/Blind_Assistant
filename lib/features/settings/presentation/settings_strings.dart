@@ -1,3 +1,4 @@
+import '../../../core/consent/consent_scope.dart';
 import '../domain/entities/app_settings.dart';
 import 'cubit/text_size_step.dart';
 
@@ -23,6 +24,8 @@ class SettingsStrings {
   String get haptics => _s('haptics');
   String get wakeWord => _s('wakeWord');
   String get imageUpload => _s('imageUpload');
+  String get audioUpload => _s('audioUpload');
+  String get locationShare => _s('locationShare');
   String get deleteData => _s('deleteData');
   String get deleteValue => _s('deleteValue');
   String get changeHint => _s('changeHint');
@@ -35,6 +38,12 @@ class SettingsStrings {
   String get deletedMessage => _s('deletedMessage');
   String get back => _s('back');
   String get goBack => _s('goBack');
+
+  String consentLabel(ConsentScope scope) => switch (scope) {
+    ConsentScope.imageUpload => imageUpload,
+    ConsentScope.audioUpload => audioUpload,
+    ConsentScope.locationShare => locationShare,
+  };
 
   String voiceRateValue(VoiceRate rate) => _s('rate_${rate.name}');
 
@@ -61,6 +70,8 @@ class SettingsStrings {
     'haptics': 'الاهتزاز',
     'wakeWord': '«يا بصير»',
     'imageUpload': 'إرسال الصور',
+    'audioUpload': 'إرسال الصوت',
+    'locationShare': 'مشاركة الموقع',
     'deleteData': 'حذف بياناتي',
     'deleteValue': 'نقرتان',
     'changeHint': 'انقر مرتين للتغيير',
@@ -99,6 +110,8 @@ class SettingsStrings {
     'haptics': 'Vibration',
     'wakeWord': '"Ya Baseer" voice trigger',
     'imageUpload': 'Send photos',
+    'audioUpload': 'Send audio',
+    'locationShare': 'Share location',
     'deleteData': 'Delete my data',
     'deleteValue': 'Double tap',
     'changeHint': 'Double tap to change',

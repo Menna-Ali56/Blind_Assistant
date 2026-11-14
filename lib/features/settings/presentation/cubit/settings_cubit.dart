@@ -80,9 +80,6 @@ class SettingsCubit extends BaseCubit<SettingsState> {
   Future<void> toggleWakeWord() =>
       _update((s) => s.copyWith(wakeWord: !s.wakeWord));
 
-  Future<void> toggleImageUpload() =>
-      _update((s) => s.copyWith(allowImageUpload: !s.allowImageUpload));
-
   /// Removes everything stored on the device and goes back to the defaults.
   Future<void> deleteAllData() async {
     final result = await _delete();

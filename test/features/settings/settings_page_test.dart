@@ -1,4 +1,9 @@
+import 'package:baseer/core/consent/consent.dart';
 import 'package:baseer/core/errors/errors.dart';
+import 'package:baseer/core/output/output.dart';
+import 'package:baseer/core/storage/in_memory_secure_store.dart';
+import 'package:baseer/features/consent/consent.dart';
+import 'package:baseer/features/consent/data/repositories/consent_repository_impl.dart';
 import 'package:baseer/features/settings/domain/entities/app_settings.dart';
 import 'package:baseer/features/settings/domain/repositories/settings_repository.dart';
 import 'package:baseer/features/settings/domain/usecases/delete_user_data.dart';
@@ -32,34 +37,48 @@ class MemoryRepository implements SettingsRepository {
 
 void main() {
   late SettingsCubit cubit;
+  late ConsentCubit consentCubit;
+  late GrantedConsent grantedConsent;
   late ErrorSupervisor supervisor;
 
   setUp(() {
     final repository = MemoryRepository();
     supervisor = ErrorSupervisor();
+    grantedConsent = GrantedConsent();
     cubit = SettingsCubit(
       loadSettings: LoadSettings(repository),
       saveSettings: SaveSettings(repository),
       deleteUserData: DeleteUserData(repository),
       supervisor: supervisor,
     );
+    consentCubit = ConsentCubit(
+      repository: ConsentRepositoryImpl(InMemorySecureStore()),
+      granted: grantedConsent,
+      output: OutputCoordinator(const SilentOutputChannel()),
+      languageCode: () => 'en',
+    );
   });
 
   tearDown(() async {
     await cubit.close();
+    await consentCubit.close();
     await supervisor.dispose();
   });
 
   Future<void> pumpPage(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     await cubit.load();
+    await consentCubit.load();
     await tester.pumpWidget(
       MaterialApp(
-        home: BlocProvider<SettingsCubit>.value(
-          value: cubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<SettingsCubit>.value(value: cubit),
+            BlocProvider<ConsentCubit>.value(value: consentCubit),
+          ],
           child: const SettingsPage(),
         ),
       ),
@@ -76,20 +95,24 @@ void main() {
       'High contrast',
       'Vibration',
       'Send photos',
+      'Send audio',
+      'Share location',
       'Delete my data',
     ]) {
       expect(find.text(label), findsOneWidget);
     }
-    expect(find.text('Not allowed'), findsOneWidget);
+    expect(find.text('Not allowed'), findsNWidgets(3));
   });
 
   testWidgets('tapping a row changes its value', (tester) async {
     await pumpPage(tester);
 
     await tester.tap(find.text('Voice speed'));
+    await tester.tap(find.text('Send photos'));
     await tester.pumpAndSettle();
 
     expect(find.text('Fast'), findsOneWidget);
+    expect(grantedConsent.allows(ConsentScope.imageUpload), isTrue);
   });
 
   testWidgets('rows are buttons with a spoken name and value', (tester) async {
@@ -98,6 +121,7 @@ void main() {
 
     expect(find.bySemanticsLabel('Voice speed, Normal'), findsOneWidget);
     expect(find.bySemanticsLabel('Send photos, Not allowed'), findsOneWidget);
+    expect(find.bySemanticsLabel('Send audio, Not allowed'), findsOneWidget);
 
     handle.dispose();
   });
@@ -106,6 +130,8 @@ void main() {
     tester,
   ) async {
     await pumpPage(tester);
+    await consentCubit.toggle(ConsentScope.audioUpload);
+    expect(grantedConsent.allows(ConsentScope.audioUpload), isTrue);
 
     await tester.tap(find.text('Delete my data'));
     await tester.pumpAndSettle();
@@ -115,6 +141,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Data deleted'), findsOneWidget);
+    expect(grantedConsent.allows(ConsentScope.audioUpload), isFalse);
 
     await tester.tap(find.text('Back to settings'));
     await tester.pumpAndSettle();

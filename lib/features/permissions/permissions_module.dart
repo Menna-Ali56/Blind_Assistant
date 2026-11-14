@@ -1,10 +1,12 @@
 import 'package:get_it/get_it.dart';
 
+import '../../core/accessibility/screen_reader_status.dart';
 import '../../core/di/cubit_registration.dart';
 import '../../core/di/di_module.dart';
 import '../../core/output/output.dart';
-import 'data/repositories/in_memory_permission_flow_progress.dart';
+import '../../core/storage/secure_store.dart';
 import 'data/repositories/permission_handler_repository.dart';
+import 'data/repositories/secure_permission_flow_progress.dart';
 import 'domain/entities/granted_permissions.dart';
 import 'domain/repositories/permission_flow_progress.dart';
 import 'domain/repositories/permission_repository.dart';
@@ -22,7 +24,7 @@ class PermissionsModule implements DiModule {
         () => const PermissionHandlerRepository(),
       )
       ..registerLazySingleton<PermissionFlowProgress>(
-        InMemoryPermissionFlowProgress.new,
+        () => SecurePermissionFlowProgress(locator<SecureStore>()),
       )
       ..registerLazySingleton<GrantedPermissions>(GrantedPermissions.new)
       ..registerSharedCubit<PermissionsCubit>(
@@ -32,6 +34,9 @@ class PermissionsModule implements DiModule {
           progress: locator<PermissionFlowProgress>(),
           output: locator<OutputCoordinator>(),
           languageCode: languageCode,
+          screenReader: locator.isRegistered<ScreenReaderStatus>()
+              ? locator<ScreenReaderStatus>()
+              : const PlatformScreenReaderStatus(),
         ),
       );
   }
