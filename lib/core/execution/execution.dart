@@ -6,4 +6,5 @@ export 'execution_matrix.dart';
 export 'execution_module.dart';
 export 'execution_policy.dart';
 export 'execution_router.dart';
+export 'local_model_catalog.dart';
 export 'unavailable_reason.dart';

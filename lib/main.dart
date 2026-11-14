@@ -9,7 +9,7 @@ import 'features/theme/presentation/cubit/theme_state.dart';
 import 'features/theme/presentation/widgets/apply_text_scale.dart';
 import 'features/theme/presentation/widgets/theme_variant_builder.dart';
 
-void main() => bootstrap(const BaseerApp());
+Future<void> main() => bootstrap(const BaseerApp());
 
 class BaseerApp extends StatelessWidget {
   const BaseerApp({super.key});
