@@ -140,7 +140,7 @@ void main() {
   });
 
   test('deleting removes the data and resets the settings', () async {
-    repository.stored = const AppSettings(allowImageUpload: true);
+    repository.stored = const AppSettings(highContrast: true);
     await cubit.load();
 
     await cubit.deleteAllData();

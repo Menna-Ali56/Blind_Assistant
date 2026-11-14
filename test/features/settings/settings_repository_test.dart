@@ -46,7 +46,6 @@ void main() {
       highContrast: true,
       haptics: false,
       wakeWord: false,
-      allowImageUpload: true,
     );
 
     await repository.save(saved);
