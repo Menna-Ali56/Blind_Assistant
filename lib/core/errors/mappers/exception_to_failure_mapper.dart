@@ -19,6 +19,7 @@ class ExceptionToFailureMapper {
       NetworkException() ||
       SocketException() ||
       HttpException() => const NetworkFailure(),
+      ContractException() => const UnknownFailure(),
       ServerException(:final statusCode) => ServerFailure(
         statusCode: statusCode,
       ),

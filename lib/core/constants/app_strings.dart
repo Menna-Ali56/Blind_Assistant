@@ -1,6 +1,5 @@
 class AppStrings {
   const AppStrings._();
-
   static const appTitle = 'Baseer';
   static const welcomeMessage = 'Welcome to Baseer';
   static const homeLabel = 'Home';
@@ -13,4 +12,6 @@ class AppStrings {
   static const assistantHint = 'Talk to the voice assistant';
   static const comingSoon = 'This screen is coming soon';
   static const retryLabel = 'Try again';
+  static const settingsLabel = 'Settings';
+  static const settingsHint = 'Voice, text size and privacy options';
 }

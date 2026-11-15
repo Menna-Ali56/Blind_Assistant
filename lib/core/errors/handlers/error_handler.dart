@@ -14,11 +14,17 @@ class ErrorHandler {
 
   Failure handle(Object error, StackTrace stackTrace, {String? context}) {
     final failure = mapper.map(error);
-    logger.log(error, stackTrace, context: context, code: failure.code);
+    logger.log(
+      error,
+      stackTrace,
+      context: context,
+      code: failure.code,
+      fields: failure.logFields,
+    );
     return failure;
   }
 
-  /// Runs [action] and never throws: errors become a ResultFailure.
+  // run action and catch any error
   Future<Result<T>> guard<T>(
     Future<T> Function() action, {
     String? context,
@@ -30,7 +36,7 @@ class ErrorHandler {
     }
   }
 
-  /// Synchronous version of [guard].
+  // sync form of guard
   Result<T> guardSync<T>(T Function() action, {String? context}) {
     try {
       return ResultSuccess(action());

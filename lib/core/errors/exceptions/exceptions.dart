@@ -1,5 +1,6 @@
 export 'app_exception.dart';
 export 'camera_exception.dart';
+export 'contract_exception.dart';
 export 'microphone_exception.dart';
 export 'model_exception.dart';
 export 'network_exception.dart';

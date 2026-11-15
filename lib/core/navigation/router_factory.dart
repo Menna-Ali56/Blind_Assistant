@@ -6,9 +6,14 @@ import 'app_shell.dart';
 
 typedef PageResolver = Widget Function(AppDestination destination);
 
-GoRouter buildRouter(PageResolver pageFor) {
+GoRouter buildRouter(
+  PageResolver pageFor, {
+  List<RouteBase> extraRoutes = const [],
+  GoRouterRedirect? redirect,
+}) {
   return GoRouter(
     initialLocation: AppDestination.initial.path,
+    redirect: redirect,
     onException: (context, state, router) {
       router.go(AppDestination.initial.path);
     },
@@ -27,6 +32,7 @@ GoRouter buildRouter(PageResolver pageFor) {
             ),
         ],
       ),
+      ...extraRoutes,
     ],
   );
 }

@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 
-/// Signature for forwarding errors to a crash-reporting service.
 typedef ErrorReporter =
     void Function(
       Object error,
@@ -12,21 +11,21 @@ typedef ErrorReporter =
 class ErrorLogger {
   const ErrorLogger();
 
-  /// Set once at startup to forward errors to Crashlytics / Sentry:
-  /// `ErrorLogger.reporter = (e, st, ctx, code) => ...;`
-  /// Send only the error type, context and code. Never send user content.
+  // set once to send errors out
   static ErrorReporter? reporter;
 
-  /// Never pass OCR text, transcripts, images, tokens, or personal content here.
+  // never send user data or tokens here
   void log(
     Object error,
     StackTrace stackTrace, {
     String? context,
     String? code,
+    Map<String, Object?> fields = const {},
   }) {
+    final extra = fields.isEmpty ? '' : '; fields: $fields';
     developer.log(
       'Handled error: ${error.runtimeType}; '
-      'context: ${context ?? 'unknown'}; code: ${code ?? 'none'}',
+      'context: ${context ?? 'unknown'}; code: ${code ?? 'none'}$extra',
       name: 'Baseer.Error',
       error: error.runtimeType.toString(),
       stackTrace: stackTrace,
@@ -36,7 +35,7 @@ class ErrorLogger {
     try {
       reporter?.call(error, stackTrace, context, code);
     } catch (_) {
-      // A broken reporter must never crash the app.
+      return;
     }
   }
 }
