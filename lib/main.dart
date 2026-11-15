@@ -30,4 +30,3 @@ class BaseerApp extends StatelessWidget {
     );
   }
 }
-
