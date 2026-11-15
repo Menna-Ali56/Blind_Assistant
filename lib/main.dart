@@ -20,10 +20,10 @@ class BaseerApp extends StatelessWidget {
       builder: (context, variant) => MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: AppStrings.appTitle,
-        themeMode: variant == ThemeVariant.highContrast
-            ? ThemeMode.dark
-            : ThemeMode.light,
-        highContrastTheme: AppTheme.highContrast,
+        theme: variant == ThemeVariant.highContrast
+            ? AppTheme.highContrast
+            : AppTheme.standard,
+
         builder: applyTextScale,
         routerConfig: sl<GoRouter>(),
       ),

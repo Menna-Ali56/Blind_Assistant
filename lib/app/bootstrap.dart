@@ -14,6 +14,7 @@ import 'app_modules.dart';
 import 'app_providers.dart';
 
 const String _uncaughtSource = 'uncaught';
+const String _connectivitySource = 'connectivity_monitor';
 
 Future<void> bootstrap(Widget app) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +22,25 @@ Future<void> bootstrap(Widget app) async {
   GlobalErrorHandler(onUnhandled: _reportUncaught).install();
   ErrorWidget.builder = (_) => const SafeErrorView();
   configureDependencies(appModules);
-  await sl<ConnectivityMonitor>().start();
+  await _startConnectivityMonitor();
   await sl<PermissionFlowProgress>().load();
   await sl<ConsentCubit>().load();
   await sl<SettingsCubit>().load();
   sl<ErrorOutputBridge>().start();
   sl<SafeStateGuard>().start();
   runApp(AppProviders(child: app));
+}
+
+Future<void> _startConnectivityMonitor() async {
+  try {
+    await sl<ConnectivityMonitor>().start();
+  } catch (error, stackTrace) {
+    sl<ErrorSupervisor>().report(
+      error,
+      stackTrace: stackTrace,
+      source: _connectivitySource,
+    );
+  }
 }
 
 void _reportUncaught(Object error, StackTrace stack) {
