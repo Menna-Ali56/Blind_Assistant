@@ -4,6 +4,9 @@ import '../accessibility/screen_reader_status.dart';
 import '../constants/app_languages.dart';
 import '../di/di_module.dart';
 import '../errors/errors.dart';
+import '../feedback/cue_output.dart';
+import '../feedback/no_cue_output.dart';
+import '../feedback/shared_audio_focus.dart';
 import 'announcement_channel.dart';
 import 'audio_focus.dart';
 import 'audio_session_focus.dart';
@@ -27,7 +30,9 @@ class OutputModule implements DiModule {
       );
     }
     if (!locator.isRegistered<AudioFocus>()) {
-      locator.registerLazySingleton<AudioFocus>(AudioSessionFocus.new);
+      locator.registerLazySingleton<AudioFocus>(
+        () => SharedAudioFocus(AudioSessionFocus()),
+      );
     }
     if (!locator.isRegistered<OutputChannel>()) {
       locator.registerLazySingleton<OutputChannel>(() {
@@ -47,6 +52,9 @@ class OutputModule implements DiModule {
         () => OutputCoordinator(
           locator<OutputChannel>(),
           focus: locator<AudioFocus>(),
+          cues: locator.isRegistered<CueOutput>()
+              ? locator<CueOutput>()
+              : const NoCueOutput(),
         ),
         dispose: (coordinator) => coordinator.dispose(),
       )
