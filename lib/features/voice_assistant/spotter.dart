@@ -1,0 +1,15 @@
+export 'data/catalog/command_keywords.dart';
+export 'domain/catalog/catalog_entry.dart';
+export 'domain/catalog/command_catalog.dart';
+export 'domain/catalog/confidence_table.dart';
+export 'domain/catalog/keyword_normalizer.dart';
+export 'domain/catalog/spotter_limits.dart';
+export 'domain/controller/spotter_controller.dart';
+export 'domain/controller/wake_gate.dart';
+export 'domain/entities/command_locale.dart';
+export 'domain/entities/parsed_command.dart';
+export 'domain/entities/slot_keys.dart';
+export 'domain/entities/spotter_event.dart';
+export 'domain/repositories/command_sink.dart';
+export 'domain/repositories/keyword_spotter.dart';
+export 'spotter_module.dart';
