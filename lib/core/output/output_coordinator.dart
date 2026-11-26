@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import '../feedback/cue_output.dart';
+import '../feedback/feedback_cue.dart';
+import '../feedback/no_cue_output.dart';
 import 'audio_focus.dart';
 import 'output_channel.dart';
 import 'output_message.dart';
@@ -9,6 +12,7 @@ class OutputCoordinator {
   OutputCoordinator(
     this._channel, {
     this.focus = const NoAudioFocus(),
+    this.cues = const NoCueOutput(),
     DateTime Function()? now,
     this.maxPending = defaultMaxPending,
     this.onChannelError,
@@ -22,6 +26,7 @@ class OutputCoordinator {
 
   final OutputChannel _channel;
   final AudioFocus focus;
+  final CueOutput cues;
   final DateTime Function() _now;
 
   /// Waiting messages above this count are dropped, lowest priority first.
@@ -87,9 +92,14 @@ class OutputCoordinator {
     if (_current == null) return Future<void>.value();
     final signal = _stopSignal;
     if (signal != null && !signal.isCompleted) signal.complete();
-    final stopping = _safe(_channel.stop);
+    final stopping = _stopAll();
     _stopping = stopping;
     return stopping;
+  }
+
+  Future<void> _stopAll() {
+    if (cues is NoCueOutput) return _safe(_channel.stop);
+    return Future.wait([_safe(_channel.stop), _safe(cues.cancel)]);
   }
 
   Future<void> _drain() async {
@@ -135,6 +145,11 @@ class OutputCoordinator {
       if (!_hasFocus) {
         _hasFocus = true;
         if (focus is! NoAudioFocus) await _safe(focus.acquire);
+      }
+      if (signal.isCompleted) return;
+      if (cues is! NoCueOutput) {
+        final cue = FeedbackCue.forPriority(message.priority);
+        if (cue != null) await _safe(() => cues.play(cue));
       }
       if (signal.isCompleted) return;
       if (message.haptic != OutputHaptic.none) {
