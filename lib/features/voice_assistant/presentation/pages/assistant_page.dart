@@ -313,15 +313,7 @@ class _AssistantPageState extends State<AssistantPage> {
                           ),
                     ),
                     const SizedBox(height: 30),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: const [
-                        Chip(label: Text('“Read this text”')),
-                        Chip(label: Text('“What color is this?”')),
-                      ],
-                    ),
+
                   ],
                 ),
               ),
