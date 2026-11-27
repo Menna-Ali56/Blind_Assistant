@@ -16,6 +16,7 @@ import 'package:get_it/get_it.dart';
 import '../core/network/fake_connectivity_monitor.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   test('every app module resolves cleanly', () async {
     final locator = GetIt.asNewInstance()..allowReassignment = true;
     configureDependencies(appModules, locator: locator);
