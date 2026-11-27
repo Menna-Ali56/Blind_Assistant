@@ -18,17 +18,37 @@ const String _connectivitySource = 'connectivity_monitor';
 
 Future<void> bootstrap(Widget app) async {
   WidgetsFlutterBinding.ensureInitialized();
+
   Bloc.observer = AppBlocObserver();
+
   GlobalErrorHandler(onUnhandled: _reportUncaught).install();
+
   ErrorWidget.builder = (_) => const SafeErrorView();
+
   configureDependencies(appModules);
+
   await _startConnectivityMonitor();
+
   await sl<PermissionFlowProgress>().load();
   await sl<ConsentCubit>().load();
   await sl<SettingsCubit>().load();
+
   sl<ErrorOutputBridge>().start();
   sl<SafeStateGuard>().start();
+
   runApp(AppProviders(child: app));
+
+  // Temporary TTS device integration test.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    sl<OutputCoordinator>().submit(
+      OutputMessage(
+        text: 'مرحبًا بك في بصير، أنا مساعدك الصوتي.',
+        languageCode: 'ar',
+        key: 'tts_device_test',
+        ownerId: 'tts_device_test',
+      ),
+    );
+  });
 }
 
 Future<void> _startConnectivityMonitor() async {

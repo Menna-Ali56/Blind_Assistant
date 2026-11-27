@@ -8,10 +8,13 @@ import '../core/network/network_module.dart';
 import '../core/output/output_module.dart';
 import '../core/storage/storage_module.dart';
 import '../core/tasks/tasks_module.dart';
+
 import '../features/consent/consent_module.dart';
 import '../features/permissions/permissions_module.dart';
 import '../features/settings/settings_module.dart';
 import '../features/theme/theme_module.dart';
+import '../features/text_to_speech/text_to_speech_module.dart';
+
 import '../features/voice_assistant/data/sherpa_module.dart';
 import '../features/voice_assistant/navigation_commands.dart';
 import '../features/voice_assistant/settings_commands/settings_commands.dart';
@@ -19,13 +22,18 @@ import '../features/voice_assistant/spotter_module.dart';
 import '../features/voice_assistant/voice_assistant_module.dart';
 import '../features/voice_assistant/voice_capture_module.dart';
 import '../features/voice_assistant/voice_interaction_module.dart';
+
 import 'environment_module.dart';
 import 'navigation_module.dart';
 import 'safety_module.dart';
 
 const List<DiModule> appModules = [
   ErrorsModule(),
+
+  // Text-to-Speech must be registered before OutputModule.
+  TextToSpeechModule(),
   OutputModule(),
+
   FeedbackModule(),
   AuthModule(),
   NetworkModule(),
@@ -38,10 +46,12 @@ const List<DiModule> appModules = [
   NavigationModule(),
   TasksModule(),
   SettingsModule(),
+
   VoiceAssistantModule(),
   NavigationCommandsModule(),
   SettingsCommandsModule(),
   SafetyModule(),
+
   SherpaModule(),
   SpotterModule(),
   AudioModule(),
