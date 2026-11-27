@@ -8,8 +8,6 @@ import '../permissions/domain/repositories/permission_repository.dart';
 import 'data/audio_frame_source.dart';
 import 'data/frame_source_recorder_backend.dart';
 
-/// Connects the core audio capture to this feature's microphone and to the
-/// permissions feature.
 class VoiceCaptureModule implements DiModule {
   const VoiceCaptureModule();
 

@@ -18,7 +18,6 @@ class PcmAudioCapture implements AudioCapture {
   }) : interruptions = interruptions.asBroadcastStream(),
        _errors = errorHandler;
 
-  /// A safety net. The caller normally stops long before this.
   static const Duration defaultMaxDuration = Duration(seconds: 60);
   static const String _logContext = 'audio_capture';
 
@@ -28,7 +27,6 @@ class PcmAudioCapture implements AudioCapture {
   final AudioFormat format;
   final Duration maxDuration;
 
-  /// Something took the audio away (a call, another app).
   final Stream<void> interruptions;
 
   final BytesBuilder _buffer = BytesBuilder();
