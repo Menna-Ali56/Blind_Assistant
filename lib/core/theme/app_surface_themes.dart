@@ -18,18 +18,15 @@ class AppSurfaceThemes {
     ),
   );
 
-  static AppBarTheme appBar(ColorScheme c, TextTheme t) =>
-      AppBarTheme(
-        backgroundColor: c.surface,
-        foregroundColor: c.onSurface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        toolbarHeight: AppDimens.buttonHeight,
-        titleTextStyle: t.titleLarge?.copyWith(
-          color: c.primary,
-        ),
-      );
+  static AppBarTheme appBar(ColorScheme c, TextTheme t) => AppBarTheme(
+    backgroundColor: c.surface,
+    foregroundColor: c.onSurface,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    centerTitle: false,
+    toolbarHeight: AppDimens.buttonHeight,
+    titleTextStyle: t.titleLarge?.copyWith(color: c.primary),
+  );
   static NavigationBarThemeData navigationBar(ColorScheme c, TextTheme t) {
     return NavigationBarThemeData(
       height: AppDimens.navHeight,

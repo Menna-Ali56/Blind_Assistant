@@ -313,7 +313,6 @@ class _AssistantPageState extends State<AssistantPage> {
                           ),
                     ),
                     const SizedBox(height: 30),
-
                   ],
                 ),
               ),

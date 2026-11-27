@@ -8,9 +8,9 @@ class AppColorSchemes {
     brightness: Brightness.light,
 
     // Primary
-    primary: Color(0xFF2DD4BF),
-    onPrimary: Color(0xFF0A1F3D),
-    primaryContainer: Color(0xFFD9F5F1),
+    primary: Color(0xFF08756D),
+    onPrimary: Color(0xFFFFFFFF),
+    primaryContainer: Color(0xFFE8F7F4),
     onPrimaryContainer: Color(0xFF064E49),
 
     // Secondary
@@ -18,8 +18,8 @@ class AppColorSchemes {
     onSecondary: Color(0xFFFFFFFF),
 
     // Tertiary
-    tertiary: Color(0xFFFFB020),
-    onTertiary: Color(0xFF0A1F3D),
+    tertiary: Color(0xFF8A5700),
+    onTertiary: Color(0xFFFFFFFF),
     tertiaryContainer: Color(0xFFFFF1D6),
     onTertiaryContainer: Color(0xFF5C3B00),
 
@@ -32,14 +32,14 @@ class AppColorSchemes {
     // Main surfaces
     surface: Color(0xFFF8FCFB),
     onSurface: Color(0xFF0A1F3D),
-    onSurfaceVariant: Color(0xFF60758A),
+    onSurfaceVariant: Color(0xFF526779),
 
     // Surface containers
     surfaceContainer: Color(0xFFFFFFFF),
     surfaceContainerHighest: Color(0xFFEAF5F3),
 
     // Borders
-    outline: Color(0xFF9CB8B4),
+    outline: Color(0xFF718985),
     outlineVariant: Color(0xFFD5E5E3),
   );
 
