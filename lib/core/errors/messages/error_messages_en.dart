@@ -11,6 +11,8 @@ const Map<String, String> englishErrorMessages = {
   'model_error': 'The AI model could not complete the operation.',
   'ocr_error': 'Text could not be recognized from the image.',
   'speech_error': 'Something went wrong while processing speech.',
+  'speech_no_input':
+      'I did not hear anything. Please try again and speak clearly.',
   'unexpected_error': 'An unexpected error occurred. Please try again.',
   'ocr_no_text':
       'No text found. Move the camera closer to the text and check the lighting.',

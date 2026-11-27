@@ -1,3 +1,4 @@
+import '../core/audio/audio_module.dart';
 import '../core/auth/auth_module.dart';
 import '../core/di/di_module.dart';
 import '../core/errors/errors_module.dart';
@@ -16,6 +17,7 @@ import '../features/voice_assistant/navigation_commands.dart';
 import '../features/voice_assistant/settings_commands/settings_commands.dart';
 import '../features/voice_assistant/spotter_module.dart';
 import '../features/voice_assistant/voice_assistant_module.dart';
+import '../features/voice_assistant/voice_capture_module.dart';
 import 'environment_module.dart';
 import 'navigation_module.dart';
 import 'safety_module.dart';
@@ -41,4 +43,6 @@ const List<DiModule> appModules = [
   SafetyModule(),
   SherpaModule(),
   SpotterModule(),
+  AudioModule(),
+  VoiceCaptureModule(),
 ];
