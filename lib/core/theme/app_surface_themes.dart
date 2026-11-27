@@ -25,9 +25,8 @@ class AppSurfaceThemes {
     scrolledUnderElevation: 0,
     centerTitle: false,
     toolbarHeight: AppDimens.buttonHeight,
-    titleTextStyle: t.titleLarge,
+    titleTextStyle: t.titleLarge?.copyWith(color: c.primary),
   );
-
   static NavigationBarThemeData navigationBar(ColorScheme c, TextTheme t) {
     return NavigationBarThemeData(
       height: AppDimens.navHeight,

@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  for (final entry in {
+  final themes = {
     'standard': AppTheme.standard,
     'high contrast': AppTheme.highContrast,
-  }.entries) {
+  };
+
+  for (final entry in themes.entries) {
     group(entry.key, () {
       final theme = entry.value;
 
@@ -17,16 +19,23 @@ void main() {
           theme.outlinedButtonTheme.style,
           theme.textButtonTheme.style,
         ];
+
         for (final style in styles) {
           final size = style!.minimumSize!.resolve({})!;
+
           expect(size.height, greaterThanOrEqualTo(AppDimens.minTouch));
           expect(size.width, greaterThanOrEqualTo(AppDimens.minTouch));
         }
       });
 
-      test('uses material 3 in dark mode', () {
+      test('uses Material 3 with the expected brightness', () {
         expect(theme.useMaterial3, isTrue);
-        expect(theme.brightness, Brightness.dark);
+
+        final expectedBrightness = entry.key == 'standard'
+            ? Brightness.light
+            : Brightness.dark;
+
+        expect(theme.brightness, expectedBrightness);
       });
     });
   }
