@@ -5,8 +5,6 @@ import 'audio_format.dart';
 
 enum SpeechSignal { none, speechStarted, speechEnded, noSpeech }
 
-/// Finds where speech starts and ends by looking at how loud the audio is.
-/// It counts audio time, not clock time, so it behaves the same in tests.
 class SpeechDetector {
   SpeechDetector({
     this.format = AudioFormat.speech,
@@ -16,13 +14,10 @@ class SpeechDetector {
     this.noSpeechTimeout = defaultNoSpeechTimeout,
   });
 
-  /// Loudness (0 to 1) that counts as sound.
   static const double defaultThreshold = 0.02;
 
-  /// Shorter sounds (a click) are not speech.
   static const Duration defaultMinSpeech = Duration(milliseconds: 150);
 
-  /// Slow speakers need a long pause before we decide they are done.
   static const Duration defaultSilenceToEnd = Duration(milliseconds: 1200);
   static const Duration defaultNoSpeechTimeout = Duration(seconds: 6);
 
@@ -78,7 +73,6 @@ class SpeechDetector {
     _done = false;
   }
 
-  /// Loudness of 16-bit little endian PCM, from 0 (silence) to 1 (full scale).
   static double rmsOf(Uint8List pcm) {
     final samples = pcm.lengthInBytes ~/ AudioFormat.bytesPerSample;
     if (samples == 0) return 0;

@@ -18,6 +18,7 @@ import '../features/voice_assistant/settings_commands/settings_commands.dart';
 import '../features/voice_assistant/spotter_module.dart';
 import '../features/voice_assistant/voice_assistant_module.dart';
 import '../features/voice_assistant/voice_capture_module.dart';
+import '../features/voice_assistant/voice_interaction_module.dart';
 import 'environment_module.dart';
 import 'navigation_module.dart';
 import 'safety_module.dart';
@@ -45,4 +46,5 @@ const List<DiModule> appModules = [
   SpotterModule(),
   AudioModule(),
   VoiceCaptureModule(),
+  VoiceInteractionModule(),
 ];

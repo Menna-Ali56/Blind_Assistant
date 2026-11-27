@@ -29,10 +29,8 @@ class OutputCoordinator {
   final CueOutput cues;
   final DateTime Function() _now;
 
-  /// Waiting messages above this count are dropped, lowest priority first.
   final int maxPending;
 
-  /// Called when the channel throws. The queue keeps going either way.
   final void Function(Object error, StackTrace stackTrace)? onChannelError;
 
   final OutputQueue _queue = OutputQueue();
@@ -43,10 +41,17 @@ class OutputCoordinator {
   bool _hasFocus = false;
   bool _draining = false;
   bool _disposed = false;
+  bool _wasBusy = false;
+  final StreamController<bool> _busyChanges =
+      StreamController<bool>.broadcast();
 
   bool get isSpeaking => _current != null;
 
   int get pendingCount => _queue.length;
+
+  bool get isBusy => _current != null || !_queue.isEmpty;
+
+  Stream<bool> get busyChanges => _busyChanges.stream;
 
   void submit(OutputMessage message) {
     if (_disposed) return;
@@ -56,6 +61,7 @@ class OutputCoordinator {
     _queue.trimTo(maxPending);
     if (_shouldInterrupt(message)) unawaited(_interrupt());
     unawaited(_drain());
+    _notifyBusy();
   }
 
   /// Stops what is being spoken now. The next waiting message goes on.
@@ -65,11 +71,13 @@ class OutputCoordinator {
   void cancelOwner(String ownerId) {
     _queue.removeWhere((item) => item.message.ownerId == ownerId);
     if (_current?.ownerId == ownerId) unawaited(_interrupt());
+    _notifyBusy();
   }
 
   void clear() {
     _queue.clear();
     unawaited(_interrupt());
+    _notifyBusy();
   }
 
   Future<void> dispose() async {
@@ -79,6 +87,15 @@ class OutputCoordinator {
     _interruptionSub = null;
     await _interrupt();
     await _releaseFocus();
+    _notifyBusy();
+    await _busyChanges.close();
+  }
+
+  void _notifyBusy() {
+    final busy = isBusy;
+    if (busy == _wasBusy) return;
+    _wasBusy = busy;
+    if (!_busyChanges.isClosed) _busyChanges.add(busy);
   }
 
   bool _shouldInterrupt(OutputMessage incoming) {
@@ -115,6 +132,7 @@ class OutputCoordinator {
       }
     } finally {
       _draining = false;
+      _notifyBusy();
     }
     if (played && (_queue.isEmpty || _disposed)) {
       await _releaseFocus();
@@ -167,6 +185,7 @@ class OutputCoordinator {
     } finally {
       _current = null;
       _stopSignal = null;
+      _notifyBusy();
     }
   }
 

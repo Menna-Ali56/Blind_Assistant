@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-/// 16-bit PCM audio. Speech recognizers and wake word engines usually
-/// expect 16 kHz, mono.
 class AudioFormat {
   const AudioFormat({
     this.sampleRate = defaultSampleRate,
@@ -23,7 +21,6 @@ class AudioFormat {
   );
 }
 
-/// Raw audio that was captured.
 class AudioClip {
   const AudioClip(this.pcm, {this.format = AudioFormat.speech});
 

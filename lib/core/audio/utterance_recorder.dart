@@ -8,11 +8,6 @@ import 'speech_detector.dart';
 
 enum _EndReason { speechEnded, noSpeech, limit, cancelled, failed }
 
-/// Records one thing the user says: it starts the microphone, waits for
-/// speech, stops when the user is quiet, and returns the audio.
-///
-/// Use it inside a task so the user can cancel:
-/// `tasks.start((token) => recorder.record(cancel: token))`.
 class UtteranceRecorder {
   UtteranceRecorder(
     this._capture, {

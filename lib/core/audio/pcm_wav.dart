@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'audio_format.dart';
 
-/// Puts a WAV header in front of raw PCM, for services that want a file.
 abstract final class PcmWav {
   static const int headerBytes = 44;
   static const int _bitsPerSample = AudioFormat.bytesPerSample * 8;

@@ -9,8 +9,6 @@ import 'pcm_audio_capture.dart';
 import 'recorder_backend.dart';
 import 'utterance_recorder.dart';
 
-/// Needs a [RecorderBackend] and a [MicrophoneAccess]. The voice assistant
-/// feature registers both, so there is only one real microphone owner.
 class AudioModule implements DiModule {
   const AudioModule();
 

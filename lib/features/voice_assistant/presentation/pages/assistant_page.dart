@@ -1,14 +1,13 @@
-import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/audio/audio_capture.dart';
-import '../../../../core/errors/errors.dart';
 import '../../../../core/di/injector.dart';
-
+import '../../../../core/errors/errors.dart';
 import '../../../permissions/domain/entities/permission_kind.dart';
 import '../../../permissions/domain/repositories/permission_repository.dart';
+import '../../domain/interaction/voice_interaction_state.dart';
+import '../../domain/interaction/voice_phase.dart';
+import '../cubit/voice_interaction_cubit.dart';
 
 class AssistantPage extends StatefulWidget {
   const AssistantPage({super.key});
@@ -18,47 +17,46 @@ class AssistantPage extends StatefulWidget {
 }
 
 class _AssistantPageState extends State<AssistantPage> {
-  late final AudioCapture _audioCapture;
+  late final VoiceInteractionCubit _voice;
   late final PermissionRepository _permissionRepository;
 
-  StreamSubscription<Uint8List>? _chunksSubscription;
-  StreamSubscription<Failure>? _failuresSubscription;
-  Timer? _elapsedTimer;
-
-  bool _isStarting = false;
-  bool _isRecording = false;
-  int _receivedBytes = 0;
-  int _elapsedSeconds = 0;
-  String _statusMessage = 'Tap the microphone to start speaking';
-  String? _lastRecordingSummary;
+  String? _permissionMessage;
 
   @override
   void initState() {
     super.initState();
-    _audioCapture = sl<AudioCapture>();
+    _voice = sl<VoiceInteractionCubit>();
     _permissionRepository = sl<PermissionRepository>();
+    _startStandbyIfAllowed();
   }
 
   @override
   void dispose() {
-    _elapsedTimer?.cancel();
-    _chunksSubscription?.cancel();
-    _failuresSubscription?.cancel();
-
-    if (_audioCapture.isCapturing) {
-      unawaited(_audioCapture.cancel());
-    }
+    _voice
+      ..cancel()
+      ..stopStandby();
     super.dispose();
   }
 
-  Future<void> _toggleRecording() async {
-    if (_isStarting) return;
+  Future<void> _startStandbyIfAllowed() async {
+    final status = await _permissionRepository.statusOf(
+      PermissionKind.microphone,
+    );
+    if (status.isGranted && mounted) _voice.startStandby();
+  }
 
-    if (_isRecording) {
-      await _stopRecording();
-    } else {
-      await _startRecording();
+  Future<void> _onTap() async {
+    // Stopping needs no permission check.
+    if (_voice.state.phase != VoicePhase.idle) {
+      _voice.tap();
+      return;
     }
+    final permitted = await _ensureMicrophonePermission();
+    if (!permitted || !mounted) return;
+    setState(() => _permissionMessage = null);
+    _voice
+      ..startStandby()
+      ..tap();
   }
 
   Future<bool> _ensureMicrophonePermission() async {
@@ -83,7 +81,7 @@ class _AssistantPageState extends State<AssistantPage> {
 
     if (mounted) {
       setState(() {
-        _statusMessage = status.isBlocked
+        _permissionMessage = status.isBlocked
             ? 'Microphone access is blocked. Enable it in Settings.'
             : 'Microphone permission was not granted.';
       });
@@ -114,131 +112,33 @@ class _AssistantPageState extends State<AssistantPage> {
         false;
   }
 
-  Future<void> _startRecording() async {
-    setState(() {
-      _isStarting = true;
-      _statusMessage = 'Checking microphone permission...';
-      _lastRecordingSummary = null;
-      _receivedBytes = 0;
-      _elapsedSeconds = 0;
-    });
+  String _title(VoiceInteractionState state) => switch (state.phase) {
+    VoicePhase.idle => 'Tap to speak',
+    VoicePhase.listening => 'Listening...',
+    VoicePhase.processing => 'Working on it...',
+    VoicePhase.speaking =>
+      state.failure == null ? 'Speaking...' : 'Something went wrong',
+  };
 
-    try {
-      final permitted = await _ensureMicrophonePermission();
-      if (!permitted || !mounted) return;
-
-      await _chunksSubscription?.cancel();
-      await _failuresSubscription?.cancel();
-
-      _chunksSubscription = _audioCapture.chunks.listen((chunk) {
-        if (!mounted) return;
-        setState(() {
-          _receivedBytes += chunk.lengthInBytes;
-        });
-      });
-
-      _failuresSubscription = _audioCapture.failures.listen((failure) {
-        if (!mounted) return;
-        _elapsedTimer?.cancel();
-        setState(() {
-          _isRecording = false;
-          _isStarting = false;
-          _statusMessage = 'Recording stopped because the microphone failed.';
-        });
-      });
-
-      final result = await _audioCapture.start();
-      if (!mounted) return;
-
-      result.fold(
-        onSuccess: (_) {
-          setState(() {
-            _isRecording = true;
-            _statusMessage = 'Listening... Tap the microphone to stop.';
-          });
-          _elapsedTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-            if (!mounted) return;
-            setState(() => _elapsedSeconds++);
-          });
-        },
-        onFailure: (failure) {
-          setState(() {
-            _isRecording = false;
-            _statusMessage =
-                failure.messageKey == 'permission_denied' ||
-                    failure.messageKey == 'permission_permanently_denied'
-                ? 'Microphone permission is required.'
-                : 'Could not start recording. Please try again.';
-          });
-        },
-      );
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _statusMessage =
-              'Something went wrong while starting the microphone.';
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isStarting = false);
-      }
-    }
-  }
-
-  Future<void> _stopRecording() async {
-    _elapsedTimer?.cancel();
-    setState(() {
-      _isStarting = true;
-      _statusMessage = 'Finishing recording...';
-    });
-
-    try {
-      final result = await _audioCapture.stop();
-      if (!mounted) return;
-
-      result.fold(
-        onSuccess: (clip) {
-          final seconds = clip.duration.inSeconds;
-          final bytes = clip.pcm.lengthInBytes;
-          setState(() {
-            _isRecording = false;
-            _receivedBytes = bytes;
-            _lastRecordingSummary =
-                'Captured $bytes bytes of audio (${clip.duration.inMilliseconds} ms).';
-            _statusMessage = clip.isEmpty
-                ? 'No audio was captured. Try speaking closer to the microphone.'
-                : 'Recording completed successfully.';
-            _elapsedSeconds = seconds;
-          });
-        },
-        onFailure: (_) {
-          setState(() {
-            _isRecording = false;
-            _statusMessage = 'There is no active recording to stop.';
-          });
-        },
-      );
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _isRecording = false;
-          _statusMessage = 'Could not stop the recording cleanly.';
-        });
-      }
-    } finally {
-      await _chunksSubscription?.cancel();
-      await _failuresSubscription?.cancel();
-      _chunksSubscription = null;
-      _failuresSubscription = null;
-      if (mounted) setState(() => _isStarting = false);
-    }
-  }
-
-  String get _formattedDuration {
-    final minutes = (_elapsedSeconds ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_elapsedSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+  String _details(VoiceInteractionState state) {
+    final failure = state.failure;
+    return switch (state.phase) {
+      VoicePhase.idle =>
+        _permissionMessage ??
+            (state.standby
+                ? 'Say “Hey Baseer” or tap the microphone.'
+                : 'Tap the microphone to start speaking.'),
+      VoicePhase.listening => 'Speak now. I stop when you are quiet.',
+      VoicePhase.processing => 'Tap to cancel.',
+      VoicePhase.speaking =>
+        failure == null
+            ? 'Tap to interrupt and speak.'
+            : ErrorPresentation.from(
+                failure,
+                languageCode: 'en',
+                messages: const ErrorMessageMapper(),
+              ).spoken,
+    };
   }
 
   @override
@@ -311,106 +211,106 @@ class _AssistantPageState extends State<AssistantPage> {
                     ),
                     const SizedBox(height: 28),
                     Center(
-                      child: Column(
-                        children: [
-                          Semantics(
-                            button: true,
-                            label: _isRecording
-                                ? 'Stop voice recording'
-                                : 'Start voice recording',
-                            hint: _isRecording
-                                ? 'Double tap to stop recording'
-                                : 'Double tap to start recording',
-                            child: InkWell(
-                              customBorder: const CircleBorder(),
-                              onTap: _isStarting ? null : _toggleRecording,
-                              child: Container(
-                                width: 224,
-                                height: 224,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: colors.primary.withValues(alpha: 0.08),
-                                ),
-                                alignment: Alignment.center,
-                                child: Container(
-                                  width: 174,
-                                  height: 174,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: colors.surfaceContainer,
-                                    border: Border.all(
-                                      color: colors.primary.withValues(
-                                        alpha: 0.35,
-                                      ),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    width: 126,
-                                    height: 126,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: _isRecording
-                                          ? colors.error
-                                          : colors.primary,
-                                    ),
-                                    child: Center(
-                                      child: _isStarting
-                                          ? SizedBox(
-                                              width: 34,
-                                              height: 34,
-                                              child: CircularProgressIndicator(
-                                                color: colors.onPrimary,
+                      child:
+                          BlocBuilder<
+                            VoiceInteractionCubit,
+                            VoiceInteractionState
+                          >(
+                            bloc: _voice,
+                            builder: (context, state) {
+                              final idle = state.phase == VoicePhase.idle;
+                              final listening =
+                                  state.phase == VoicePhase.listening;
+                              final working =
+                                  state.phase == VoicePhase.processing;
+                              return Column(
+                                children: [
+                                  Semantics(
+                                    button: true,
+                                    label: idle
+                                        ? 'Start voice recording'
+                                        : 'Stop voice assistant',
+                                    hint: idle
+                                        ? 'Double tap to start recording'
+                                        : 'Double tap to stop',
+                                    child: InkWell(
+                                      customBorder: const CircleBorder(),
+                                      onTap: _onTap,
+                                      child: Container(
+                                        width: 224,
+                                        height: 224,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: colors.primary.withValues(
+                                            alpha: 0.08,
+                                          ),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          width: 174,
+                                          height: 174,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: colors.surfaceContainer,
+                                            border: Border.all(
+                                              color: colors.primary.withValues(
+                                                alpha: 0.35,
                                               ),
-                                            )
-                                          : Icon(
-                                              _isRecording
-                                                  ? Icons.stop_rounded
-                                                  : Icons.mic_none_rounded,
-                                              size: 54,
-                                              color: colors.onPrimary,
+                                              width: 2,
                                             ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            width: 126,
+                                            height: 126,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: listening
+                                                  ? colors.error
+                                                  : colors.primary,
+                                            ),
+                                            child: Center(
+                                              child: working
+                                                  ? SizedBox(
+                                                      width: 34,
+                                                      height: 34,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            color: colors
+                                                                .onPrimary,
+                                                          ),
+                                                    )
+                                                  : Icon(
+                                                      idle
+                                                          ? Icons
+                                                                .mic_none_rounded
+                                                          : Icons.stop_rounded,
+                                                      size: 54,
+                                                      color: colors.onPrimary,
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
+                                  const SizedBox(height: 18),
+                                  Text(
+                                    _title(state),
+                                    style: textTheme.headlineSmall,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _details(state),
+                                    textAlign: TextAlign.center,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                          const SizedBox(height: 18),
-                          Text(
-                            _isRecording ? 'Listening...' : 'Tap to speak',
-                            style: textTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _isRecording
-                                ? 'Recording time  $_formattedDuration'
-                                : _statusMessage,
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                          if (_lastRecordingSummary != null) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              _lastRecordingSummary!,
-                              textAlign: TextAlign.center,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colors.primary,
-                              ),
-                            ),
-                          ],
-                          if (_isRecording) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              'Audio received: $_receivedBytes bytes',
-                              style: textTheme.bodySmall,
-                            ),
-                          ],
-                        ],
-                      ),
                     ),
                     const SizedBox(height: 30),
                     Wrap(
