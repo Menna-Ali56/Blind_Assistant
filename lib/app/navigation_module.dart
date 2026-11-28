@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/di/di_module.dart';
 import '../core/navigation/redirect_chain.dart';
 import '../core/navigation/router_factory.dart';
+import '../features/camera_capture/camera_capture.dart';
 import '../features/consent/consent.dart';
 import '../features/permissions/permissions.dart';
 import '../features/settings/settings_route.dart';
@@ -17,7 +18,12 @@ class NavigationModule implements DiModule {
     locator.registerLazySingleton<GoRouter>(
       () => buildRouter(
         appPage,
-        extraRoutes: [permissionsRoute(), consentRoute(), settingsRoute()],
+        extraRoutes: [
+          permissionsRoute(),
+          consentRoute(),
+          settingsRoute(),
+          cameraCaptureRoute(),
+        ],
         redirect: chainRedirects([
           permissionsRedirect(locator<PermissionsCubit>()),
           consentRedirect(
