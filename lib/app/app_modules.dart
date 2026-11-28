@@ -9,7 +9,10 @@ import '../core/output/output_module.dart';
 import '../core/storage/storage_module.dart';
 import '../core/tasks/tasks_module.dart';
 
+import '../features/camera/camera_module.dart';
+import '../features/camera_capture/camera_capture_module.dart';
 import '../features/consent/consent_module.dart';
+import '../features/ocr/quality_gate_module.dart';
 import '../features/permissions/permissions_module.dart';
 import '../features/settings/settings_module.dart';
 import '../features/theme/theme_module.dart';
@@ -40,11 +43,14 @@ const List<DiModule> appModules = [
   StorageModule(),
   ThemeModule(),
   PermissionsModule(),
+  CameraModule(),
+  CameraCaptureModule(),
   ConsentModule(),
   ExecutionModule(),
   EnvironmentModule(),
   NavigationModule(),
   TasksModule(),
+  QualityGateModule(),
   SettingsModule(),
 
   VoiceAssistantModule(),
